@@ -15,19 +15,21 @@ datasource db {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   firstName      String
   lastName       String
-  email          String   @unique
+  email          String    @unique
   password       String
   phoneNumber    String?
   address        String?
-  role           Role
+  birthDate      DateTime?
+  gender         String?
+  role           Role      @default(USER)
   profilePicture String?
-  referralCode   String?
-  isDeleted      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  referralCode   String?   @unique
+  isDeleted      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   notification Notification[]
   point        Point[]
@@ -102,8 +104,8 @@ model Event {
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
   isActive    Boolean  @default(true)
-  tartTime    DateTime
-  ndTime      DateTime
+  startTime   DateTime
+  endTime     DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -195,7 +197,7 @@ model EventCategory {
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
-  @@map("event_catagories")
+  @@map("event_categories")
 }
 
 model Category {
