@@ -13,6 +13,8 @@ app.use("/auth", authRouter);
 
 // middleware error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  // melihat error di console
+  console.log(err);
   res.status(400).send(err.message);
 });
 

@@ -37,7 +37,7 @@ export const validateRegister = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      res.status(400).send({ errors: errors.array() });
+      res.status(400).send({ message: errors.array()[0].msg });
       return;
     }
 
