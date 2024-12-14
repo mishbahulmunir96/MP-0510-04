@@ -23,10 +23,11 @@ model User {
   phoneNumber    String?
   address        String?
   birthDate      DateTime?
-  gender         String?
+  gender         Gender
   role           Role      @default(USER)
   profilePicture String?
   referralCode   String?   @unique
+  referredBy     Int?
   isDeleted      Boolean   @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -39,12 +40,23 @@ model User {
   review       Review[]
   transaction  Transaction[]
 
+  // Relasi dengan pengguna yang mereferensi
+  referredByUser User? @relation("UserReferrals", fields: [referredBy], references: [id])
+
+  // Relasi dengan pengguna yang dirujuk
+  referrals User[] @relation("UserReferrals")
+
   @@map("users")
 }
 
 enum Role {
   USER
   ORGANIZER
+}
+
+enum Gender {
+  Male
+  Female
 }
 
 model Notification {
