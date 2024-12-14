@@ -15,25 +15,26 @@ datasource db {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
-  firstName      String
-  lastName       String
-  email          String    @unique
-  password       String
-  phoneNumber    String?
-  address        String?
-  birthDate      DateTime?
-  gender         Gender?
-  role           Role      @default(USER)
-  profilePicture String?
-  referralCode   String?   @unique
-  referredBy     Int?
-  isDeleted      Boolean   @default(false)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  firstName        String
+  lastName         String
+  email            String    @unique
+  password         String
+  phoneNumber      String?
+  address          String?
+  birthDate        DateTime?
+  gender           Gender?
+  role             Role      @default(USER)
+  profilePicture   String?
+  referralCode     String?   @unique
+  referredBy       Int?
+  point            Int       @default(0)
+  pointExpiredDate DateTime?
+  isDeleted        Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   notification Notification[]
-  point        Point[]
   coupon       Coupon[]
   voucher      Voucher[]
   event        Event[]
@@ -67,17 +68,6 @@ model Notification {
   user    User    @relation(fields: [userId], references: [id])
 
   @@map("notifications")
-}
-
-model Point {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  points    Int
-  createdAt DateTime @default(now())
-  expiredAt DateTime
-
-  @@map("points")
 }
 
 model Coupon {
