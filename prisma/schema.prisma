@@ -23,7 +23,7 @@ model User {
   phoneNumber    String?
   address        String?
   birthDate      DateTime?
-  gender         Gender
+  gender         Gender?
   role           Role      @default(USER)
   profilePicture String?
   referralCode   String?   @unique
