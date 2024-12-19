@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEventsController = void 0;
+exports.createEventController = exports.getEventsController = void 0;
 const get_events_service_1 = require("../services/event/get-events.service");
+const create_event_service_1 = require("../services/event/create-event.service");
 const getEventsController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const query = {
@@ -28,3 +29,15 @@ const getEventsController = (req, res, next) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.getEventsController = getEventsController;
+const createEventController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const files = req.files;
+        const result = yield (0, create_event_service_1.createEventService)(req.body, (_a = files.thumbnail) === null || _a === void 0 ? void 0 : _a[0], res.locals.user.id);
+        res.status(200).send(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.createEventController = createEventController;

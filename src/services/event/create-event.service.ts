@@ -1,5 +1,5 @@
 import { cloudinaryUpload } from "../../lib/cloudinary";
-import { prisma } from "../../lib/prisma";
+import prisma from "../../lib/prisma";
 
 interface CreateEventBody {
   title: string;
@@ -9,7 +9,7 @@ interface CreateEventBody {
   address: string;
   startTime: Date;
   endTime: Date;
-  availableSeats: number;
+  availableSeat: number;
   price: number;
 }
 
