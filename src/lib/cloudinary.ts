@@ -17,9 +17,12 @@ export const cloudinaryUpload = (
 ): Promise<UploadApiResponse> => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
-      (error, result: UploadApiResponse) => {
-        if (error) return reject(error);
-        resolve(result);
+      (error: any, result: UploadApiResponse) => {
+        if (error) {
+          return reject(error);
+        } else {
+          resolve(result);
+        }
       }
     );
 
@@ -31,6 +34,7 @@ const extractPublicIdFromUrl = (url: string) => {
   const urlParts = url.split("/");
   const publicIdWithExtention = urlParts[urlParts.length - 1];
   const publicId = publicIdWithExtention.split(".")[0];
+
   return publicId;
 };
 

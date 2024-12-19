@@ -99,20 +99,20 @@ model Voucher {
 }
 
 model Event {
-  id            Int       @id @default(autoincrement())
-  title         String
-  description   String    @db.Text()
-  thumbnail     String
-  address       String
-  userId        Int
-  price         Int?
+  id             Int       @id @default(autoincrement())
+  title          String
+  description    String    @db.Text()
+  thumbnail      String
+  address        String
+  userId         Int
+  price          Int?
   availableSeat Int
-  content       String    @db.Text()
-  user          User      @relation(fields: [userId], references: [id])
-  startTime     DateTime
-  endTime       DateTime
-  deletedAt     DateTime?
-  createdAt     DateTime  @default(now())
+  content        String    @db.Text()
+  user           User      @relation(fields: [userId], references: [id])
+  startTime      DateTime
+  endTime        DateTime
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
 
   schedule      Schedule[]
   review        Review[]
