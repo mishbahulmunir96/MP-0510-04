@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -98,20 +99,20 @@ model Voucher {
 }
 
 model Event {
-  id          Int       @id @default(autoincrement())
-  title       String
-  description String    @db.Text()
-  thumbnail   String
-  address     String
-  userId      Int
-  content     String    @db.Text()
-  user        User      @relation(fields: [userId], references: [id])
-  isActive    Boolean   @default(true)
-  startTime   DateTime
-  endTime     DateTime
-  deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  title         String
+  description   String    @db.Text()
+  thumbnail     String
+  address       String
+  userId        Int
+  price         Int?
+  availableSeat Int
+  content       String    @db.Text()
+  user          User      @relation(fields: [userId], references: [id])
+  startTime     DateTime
+  endTime       DateTime
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
 
   schedule      Schedule[]
   review        Review[]

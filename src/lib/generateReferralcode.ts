@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { prisma } from "./prisma";
+import prisma from "./prisma";
 
 export const generateReferralCode = async (): Promise<string> => {
   let code: string;

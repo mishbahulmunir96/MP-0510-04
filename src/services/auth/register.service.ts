@@ -1,9 +1,9 @@
 import { Role, User } from "@prisma/client";
 import { hashPassword } from "../../lib/argon";
-import { prisma } from "../../lib/prisma";
 import { generateReferralCode } from "../../lib/generateReferralcode";
 import { generateCouponCode } from "../../lib/generateCouponCode";
 import { addDays } from "date-fns";
+import prisma from "../../lib/prisma";
 
 export const registerService = async (body: User) => {
   try {
