@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPasswordController = exports.forgotPasswordController = exports.loginController = exports.registerController = void 0;
-const register_service_1 = require("../services/auth/register.service");
-const login_service_1 = require("../services/auth/login.service");
+exports.changePasswordController = exports.resetPasswordController = exports.forgotPasswordController = exports.loginController = exports.registerController = void 0;
+const change_password_service_1 = require("../services/auth/change-password.service");
 const forgot_password_service_1 = require("../services/auth/forgot-password.service");
+const login_service_1 = require("../services/auth/login.service");
+const register_service_1 = require("../services/auth/register.service");
 const reset_password_service_1 = require("../services/auth/reset-password.service");
 const registerController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -55,3 +56,17 @@ const resetPasswordController = (req, res, next) => __awaiter(void 0, void 0, vo
     }
 });
 exports.resetPasswordController = resetPasswordController;
+const changePasswordController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = Number(res.locals.user.id);
+        const { currentPassword, newPassword } = req.body;
+        const updatedUser = yield (0, change_password_service_1.changePasswordService)(userId, currentPassword, newPassword);
+        res
+            .status(200)
+            .json({ message: "Password updated successfully", user: updatedUser });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.changePasswordController = changePasswordController;

@@ -54,9 +54,12 @@ cloudinary_1.v2.config({
 const cloudinaryUpload = (file) => {
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary_1.v2.uploader.upload_stream((error, result) => {
-            if (error)
+            if (error) {
                 return reject(error);
-            resolve(result);
+            }
+            else {
+                resolve(result);
+            }
         });
         streamifier.createReadStream(file.buffer).pipe(uploadStream);
     });

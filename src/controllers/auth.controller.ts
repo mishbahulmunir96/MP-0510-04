@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { registerService } from "../services/auth/register.service";
-import { loginService } from "../services/auth/login.service";
+import { changePasswordService } from "../services/auth/change-password.service";
 import { forgotPasswordService } from "../services/auth/forgot-password.service";
+import { loginService } from "../services/auth/login.service";
+import { registerService } from "../services/auth/register.service";
 import { resetPasswordService } from "../services/auth/reset-password.service";
 
 export const registerController = async (
@@ -52,6 +53,29 @@ export const resetPasswordController = async (
     const userId = Number(res.locals.user.id);
     const result = await resetPasswordService(userId, req.body.password);
     res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePasswordController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(res.locals.user.id);
+
+    const { currentPassword, newPassword } = req.body;
+
+    const updatedUser = await changePasswordService(
+      userId,
+      currentPassword,
+      newPassword
+    );
+    res
+      .status(200)
+      .json({ message: "Password updated successfully", user: updatedUser });
   } catch (error) {
     next(error);
   }

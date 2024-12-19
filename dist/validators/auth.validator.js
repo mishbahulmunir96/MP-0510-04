@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateResetPassword = exports.validateForgotPassword = exports.validateLogin = exports.validateRegister = void 0;
+exports.validateChangePassword = exports.validateResetPassword = exports.validateForgotPassword = exports.validateLogin = exports.validateRegister = void 0;
 const express_validator_1 = require("express-validator");
 exports.validateRegister = [
     (0, express_validator_1.body)("firstName")
@@ -68,4 +68,23 @@ exports.validateResetPassword = [
         }
         next();
     },
+];
+exports.validateChangePassword = [
+    (0, express_validator_1.body)("currentPassword")
+        .notEmpty()
+        .withMessage("Current password is required"),
+    (0, express_validator_1.body)("newPassword")
+        .notEmpty()
+        .withMessage("New password is required")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters long"),
+    (0, express_validator_1.body)("confirmNewPassword")
+        .notEmpty()
+        .withMessage("Confirm new password is required")
+        .custom((value, { req }) => {
+        if (value !== req.body.newPassword) {
+            throw new Error("Password do not match");
+        }
+        return true;
+    }),
 ];
