@@ -7,7 +7,7 @@ export const fileFilter = async (
   next: NextFunction
 ) => {
   try {
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const files = req.files as { [fieldName: string]: Express.Multer.File[] };
 
     const allowedTypes = [
       "image/jpeg",
@@ -19,14 +19,14 @@ export const fileFilter = async (
       "image/heic",
     ];
 
-    for (const fieldname in files) {
-      const fileArray = files[fieldname];
+    for (const fieldName in files) {
+      const fileArray = files[fieldName];
 
       for (const file of fileArray) {
         const type = await fromBuffer(file.buffer);
 
         if (!type || !allowedTypes.includes(type.mime)) {
-          throw new Error(`File type ${type?.mime} is not allowed`);
+          throw new Error(`file type ${type?.mime} is not allowed`);
         }
       }
     }
