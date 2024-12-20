@@ -158,11 +158,13 @@ exports.Prisma.CouponScalarFieldEnum = {
 exports.Prisma.VoucherScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  discountValue: 'discountValue',
+  usedByUserId: 'usedByUserId',
   voucherCode: 'voucherCode',
-  isUsed: 'isUsed',
+  qty: 'qty',
+  usedQty: 'usedQty',
+  value: 'value',
   createdAt: 'createdAt',
-  expiryDate: 'expiryDate'
+  expDate: 'expDate'
 };
 
 exports.Prisma.EventScalarFieldEnum = {

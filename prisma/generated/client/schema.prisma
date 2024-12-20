@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "./generated/client"
@@ -41,11 +35,10 @@ model User {
   event        Event[]
   review       Review[]
   transaction  Transaction[]
+  usedVouchers Voucher[]      @relation("UsedVouchers")
 
-  // Relasi dengan pengguna yang mereferensi
   referredByUser User? @relation("UserReferrals", fields: [referredBy], references: [id])
 
-  // Relasi dengan pengguna yang dirujuk
   referrals User[] @relation("UserReferrals")
 
   @@map("users")
@@ -85,15 +78,18 @@ model Coupon {
 }
 
 model Voucher {
-  id            Int           @id @default(autoincrement())
-  userId        Int
-  user          User          @relation(fields: [userId], references: [id])
-  discountValue Float
-  voucherCode   String
-  isUsed        Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  expiryDate    DateTime
-  transaction   Transaction[]
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  user         User          @relation(fields: [userId], references: [id])
+  usedByUserId Int?
+  usedByUser   User?         @relation("UsedVouchers", fields: [usedByUserId], references: [id])
+  voucherCode  String
+  qty          Int
+  usedQty      Int           @default(0)
+  value        Int
+  createdAt    DateTime      @default(now())
+  expDate      DateTime
+  transaction  Transaction[]
 
   @@map("vouchers")
 }

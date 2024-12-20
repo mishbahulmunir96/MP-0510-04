@@ -1,4 +1,4 @@
-import { hashPassword } from "../../lib/argon"; // Impor fungsi hash yang sudah ada
+import { hashPassword } from "../../lib/argon"; 
 import prisma from "../../lib/prisma";
 import { comparePassword } from "../../lib/argon";
 
