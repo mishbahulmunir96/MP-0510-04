@@ -15,7 +15,10 @@ export const createVoucherService = async (body: Voucher, userId: number) => {
 
     const newData = await prisma.voucher.create({
       data: {
-        ...body,
+        voucherCode: body.voucherCode,
+        qty: body.qty,
+        value: body.value,
+        expDate: new Date(body.expDate),
         userId: userId,
       },
     });
