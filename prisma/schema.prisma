@@ -111,11 +111,7 @@ model Event {
   endTime       DateTime
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
- 
-  schedule      Schedule[]
-  review        Review[]
-  eventTicket   EventTicket[]
-  eventCategory EventCategory[]
+
 
   @@map("events")
 }

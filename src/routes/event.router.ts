@@ -9,6 +9,7 @@ const router = Router();
 
 router.get("/", getEventsController);
 router.get("/:id", getEventController);
+
 router.post(
     "/create-event",
     verifyToken,
