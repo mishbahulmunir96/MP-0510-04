@@ -8,9 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerService = void 0;
 const client_1 = require("@prisma/client");
@@ -23,6 +25,7 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         const { firstName, lastName, email, phoneNumber, role, password, referralCode, } = body;
         const existingUser = yield prisma_1.default.user.findFirst({
+
             where: { email },
         });
         if (existingUser) {
@@ -50,6 +53,7 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
             }
         }
         const newUser = yield prisma_1.default.user.create({
+
             data: {
                 firstName,
                 lastName,
@@ -57,6 +61,7 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
                 phoneNumber,
                 role: role !== null && role !== void 0 ? role : client_1.Role.USER,
                 password: hashedPassword,
+
                 referralCode: newReferralcode,
                 referredBy,
                 pointExpiredDate: referredBy ? (0, date_fns_1.addDays)(new Date(), 90) : null,

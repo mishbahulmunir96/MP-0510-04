@@ -26,7 +26,7 @@ export const fileFilter = async (
         const type = await fromBuffer(file.buffer);
 
         if (!type || !allowedTypes.includes(type.mime)) {
-          throw new Error(`file type ${type?.mime} is not allowed`);
+          throw new Error(`File type ${type?.mime} is not allowed`);
         }
       }
     }

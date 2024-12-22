@@ -25,8 +25,9 @@ const createEventService = (body, thumbnail, userId) => __awaiter(void 0, void 0
             throw new Error("Title already in use");
         }
         const { secure_url } = yield (0, cloudinary_1.cloudinaryUpload)(thumbnail);
+
         return yield prisma_1.default.event.create({
-            data: Object.assign(Object.assign({}, body), { thumbnail: secure_url, userId: userId }),
+          data: Object.assign(Object.assign({}, body), { thumbnail: secure_url, userId: userId }),
         });
     }
     catch (error) {

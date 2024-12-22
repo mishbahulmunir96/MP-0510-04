@@ -19,6 +19,7 @@ const getEventsService = (query) => __awaiter(void 0, void 0, void 0, function* 
         const { page, sortBy, sortOrder, take, search } = query;
         const whereClause = { deletedAt: null };
         if (search) {
+
             whereClause.OR = [{ title: { contains: search, mode: "insensitive" } }];
         }
         const events = yield prisma_1.default.event.findMany({
@@ -27,7 +28,9 @@ const getEventsService = (query) => __awaiter(void 0, void 0, void 0, function* 
             take: take,
             orderBy: { [sortBy]: sortOrder },
         });
+
         const count = yield prisma_1.default.event.count({ where: whereClause });
+
         return {
             data: events,
             meta: { page, take, total: count },
