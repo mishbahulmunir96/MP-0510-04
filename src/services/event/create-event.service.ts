@@ -30,14 +30,12 @@ export const createEventService = async (
       throw new Error("Title already in use");
     }
 
-    console.log(thumbnail);
-    
-
     const { secure_url } = await cloudinaryUpload(thumbnail);
 
     return await prisma.event.create({
       data: {
         price: Number(price),
+        
         availableSeat: Number(availableSeat),
         startTime: new Date(startTime),
         endTime: new Date(endTime),
