@@ -4,9 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -112,7 +112,6 @@ model Event {
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
 
-
   @@map("events")
 }
 
@@ -121,7 +120,6 @@ model Review {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
   rating    Int
   comment   String
   createdAt DateTime @default(now())
@@ -160,7 +158,6 @@ enum Status {
 model EventTicket {
   id            Int      @id @default(autoincrement())
   eventId       Int
-  event         Event    @relation(fields: [eventId], references: [id])
   type          Type
   price         Float
   availableseat Int

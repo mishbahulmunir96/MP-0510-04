@@ -170,10 +170,12 @@ exports.Prisma.VoucherScalarFieldEnum = {
 exports.Prisma.EventScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  name: 'name',
   description: 'description',
   thumbnail: 'thumbnail',
   address: 'address',
   userId: 'userId',
+  category: 'category',
   price: 'price',
   availableSeat: 'availableSeat',
   content: 'content',
@@ -181,15 +183,6 @@ exports.Prisma.EventScalarFieldEnum = {
   endTime: 'endTime',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt'
-};
-
-exports.Prisma.ScheduleScalarFieldEnum = {
-  id: 'id',
-  eventId: 'eventId',
-  startTime: 'startTime',
-  endTime: 'endTime',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ReviewScalarFieldEnum = {
@@ -220,21 +213,8 @@ exports.Prisma.EventTicketScalarFieldEnum = {
   eventId: 'eventId',
   type: 'type',
   price: 'price',
-  quantity: 'quantity',
+  availableseat: 'availableseat',
   sold: 'sold',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.EventCategoryScalarFieldEnum = {
-  id: 'id',
-  eventId: 'eventId',
-  categoryId: 'categoryId'
-};
-
-exports.Prisma.CategoryScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -284,12 +264,9 @@ exports.Prisma.ModelName = {
   Coupon: 'Coupon',
   Voucher: 'Voucher',
   Event: 'Event',
-  Schedule: 'Schedule',
   Review: 'Review',
   Transaction: 'Transaction',
-  EventTicket: 'EventTicket',
-  EventCategory: 'EventCategory',
-  Category: 'Category'
+  EventTicket: 'EventTicket'
 };
 
 /**
