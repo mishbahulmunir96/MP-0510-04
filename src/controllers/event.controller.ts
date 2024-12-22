@@ -37,7 +37,6 @@ export const getEventController = async (
   }
 };
 
-
 export const createEventController = async (
   req: Request,
   res: Response,
@@ -55,8 +54,4 @@ export const createEventController = async (
     next(error);
   }
 };
-
-
-
-
 

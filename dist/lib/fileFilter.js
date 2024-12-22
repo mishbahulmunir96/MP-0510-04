@@ -23,12 +23,13 @@ const fileFilter = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             "image/heif",
             "image/heic",
         ];
-        for (const fieldname in files) {
-            const fileArray = files[fieldname];
+        for (const fieldName in files) {
+            const fileArray = files[fieldName];
             for (const file of fileArray) {
                 const type = yield (0, file_type_1.fromBuffer)(file.buffer);
                 if (!type || !allowedTypes.includes(type.mime)) {
-                    throw new Error(`File type ${type === null || type === void 0 ? void 0 : type.mime} is not allowed`);
+                    throw new Error(`file type ${type === null || type === void 0 ? void 0 : type.mime} is not allowed`);
+
                 }
             }
         }

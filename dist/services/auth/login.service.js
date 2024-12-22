@@ -19,16 +19,19 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginService = void 0;
-const prisma_1 = require("../../lib/prisma");
 const argon_1 = require("../../lib/argon");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const config_1 = require("../../config");
+const prisma_1 = __importDefault(require("../../lib/prisma"));
 const loginService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = body;
-        const user = yield prisma_1.prisma.user.findFirst({
+        const user = yield prisma_1.default.user.findFirst({
             where: { email },
         });
         if (!user) {

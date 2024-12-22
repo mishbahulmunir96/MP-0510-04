@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { PaginationQueryParams } from "../../types/pagination";
-import { prisma } from "../../lib/prisma";
-
+import prisma from "../../lib/prisma";
 
 interface GetEventQuery extends PaginationQueryParams {
   search: string;
@@ -14,9 +13,7 @@ export const getEventsService = async (query: GetEventQuery) => {
     const whereClause: Prisma.EventWhereInput = { deletedAt: null };
 
     if (search) {
-      whereClause.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-      ];
+      whereClause.OR = [{ title: { contains: search, mode: "insensitive" } }];
     }
 
     const events = await prisma.event.findMany({

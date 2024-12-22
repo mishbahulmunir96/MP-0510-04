@@ -8,42 +8,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerService = void 0;
 const client_1 = require("@prisma/client");
 const argon_1 = require("../../lib/argon");
-const prisma_1 = require("../../lib/prisma");
-function generateUniqueReferralCode() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const min = 100000; // Rentang minimum
-        const max = 999999; // Rentang maksimum
-        let code;
-        while (true) {
-            // Menghasilkan kode acak
-            const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-            code = randomNumber.toString(); // Konversi ke string
-            // Cek apakah kode referral sudah ada
-            const existingCode = yield prisma_1.prisma.user.findFirst({
-                where: { referralCode: code },
-            });
-            if (!existingCode)
-                break; // Jika tidak ada, kode unik
-        }
-        return code; // Kode referral yang unik dalam format string
-    });
-}
+const generateReferralcode_1 = require("../../lib/generateReferralcode");
+const generateCouponCode_1 = require("../../lib/generateCouponCode");
+const date_fns_1 = require("date-fns");
+const prisma_1 = __importDefault(require("../../lib/prisma"));
 const registerService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { firstName, lastName, email, phoneNumber, role, password } = body;
-        const existingUser = yield prisma_1.prisma.user.findFirst({
+        const { firstName, lastName, email, phoneNumber, role, password, referralCode, } = body;
+        const existingUser = yield prisma_1.default.user.findFirst({
+
             where: { email },
         });
         if (existingUser) {
             throw new Error("Email already exist");
         }
-        const referralCode = yield generateUniqueReferralCode();
         const hashedPassword = yield (0, argon_1.hashPassword)(password);
-        return yield prisma_1.prisma.user.create({
+        const newReferralcode = yield (0, generateReferralcode_1.generateReferralCode)();
+        let referredBy = null;
+        if (referralCode) {
+            const referringUser = yield prisma_1.default.user.findFirst({
+                where: { referralCode },
+            });
+            if (referringUser) {
+                referredBy = referringUser === null || referringUser === void 0 ? void 0 : referringUser.id;
+                // point
+                yield prisma_1.default.user.update({
+                    where: { id: referredBy },
+                    data: {
+                        point: {
+                            increment: 10000,
+                        },
+                        pointExpiredDate: (0, date_fns_1.addDays)(new Date(), 90),
+                    },
+                });
+            }
+        }
+        const newUser = yield prisma_1.default.user.create({
+
             data: {
                 firstName,
                 lastName,
@@ -51,9 +61,27 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
                 phoneNumber,
                 role: role !== null && role !== void 0 ? role : client_1.Role.USER,
                 password: hashedPassword,
-                referralCode,
+
+                referralCode: newReferralcode,
+                referredBy,
+                pointExpiredDate: referredBy ? (0, date_fns_1.addDays)(new Date(), 90) : null,
             },
         });
+        if (referredBy) {
+            const newCouponcode = yield (0, generateCouponCode_1.generateCouponCode)();
+            // coupon
+            yield prisma_1.default.coupon.create({
+                data: {
+                    userId: newUser.id,
+                    couponCode: newCouponcode,
+                    value: 10,
+                    isUsed: false,
+                    createdAt: new Date(),
+                    expiredAt: (0, date_fns_1.addDays)(new Date(), 90),
+                },
+            });
+        }
+        return newUser;
     }
     catch (error) {
         throw error;

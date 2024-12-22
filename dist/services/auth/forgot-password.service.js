@@ -8,16 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.forgotPasswordService = void 0;
-const prisma_1 = require("../../lib/prisma");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const config_1 = require("../../config");
 const nodemailer_1 = require("../../lib/nodemailer");
+const prisma_1 = __importDefault(require("../../lib/prisma"));
 const forgotPasswordService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = body;
-        const user = yield prisma_1.prisma.user.findFirst({
+        const user = yield prisma_1.default.user.findFirst({
             where: { email },
         });
         if (!user) {
