@@ -8,7 +8,7 @@ export const validateCreateEvent = [
   body("category").notEmpty().withMessage("Category is required"),
   body("address").notEmpty().withMessage("address is required"),
   body("price").notEmpty().withMessage("price is required"),
-  body("availableSeats").notEmpty().withMessage("price is required"),
+  body("availableSeat").notEmpty().withMessage("availableSeats is required"),
   body("startTime").notEmpty().withMessage("available Seats is required"),
   body("endTime").notEmpty().withMessage("endTime is required"),
 

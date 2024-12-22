@@ -9,9 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -96,39 +96,27 @@ model Voucher {
 }
 
 model Event {
-  id             Int       @id @default(autoincrement())
-  title          String
-  description    String    @db.Text()
-  thumbnail      String
-  address        String
-  userId         Int
-  price          Int?
+  id            Int       @id @default(autoincrement())
+  title         String
+  name          String
+  description   String    @db.Text()
+  thumbnail     String
+  address       String
+  userId        Int
+  category      String
+  content       String    @db.Text()
+  user          User      @relation(fields: [userId], references: [id])
+  startTime     DateTime
+  endTime       DateTime
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  price         Int
   availableSeat Int
-  content        String    @db.Text()
-  user           User      @relation(fields: [userId], references: [id])
-  startTime      DateTime
-  endTime        DateTime
-  deletedAt      DateTime?
-  createdAt      DateTime  @default(now())
 
-  schedule      Schedule[]
-  review        Review[]
-  eventTicket   EventTicket[]
-  eventCategory EventCategory[]
+  review      Review[]
+  eventTicket EventTicket[]
 
   @@map("events")
-}
-
-model Schedule {
-  id        Int      @id @default(autoincrement())
-  eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
-  startTime DateTime
-  endTime   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("schedules")
 }
 
 model Review {
@@ -173,15 +161,15 @@ enum Status {
 }
 
 model EventTicket {
-  id        Int      @id @default(autoincrement())
-  eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
-  type      Type
-  price     Float
-  quantity  Int
-  sold      Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  eventId       Int
+  event         Event    @relation(fields: [eventId], references: [id])
+  type          Type
+  price         Float
+  availableseat Int
+  sold          Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("event_tickets")
 }
@@ -190,24 +178,4 @@ enum Type {
   VVIP
   VIP
   REGULER
-}
-
-model EventCategory {
-  id         Int      @id @default(autoincrement())
-  eventId    Int
-  event      Event    @relation(fields: [eventId], references: [id])
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  @@map("event_categories")
-}
-
-model Category {
-  id            Int             @id @default(autoincrement())
-  name          String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  eventCategory EventCategory[]
-
-  @@map("categories")
 }
