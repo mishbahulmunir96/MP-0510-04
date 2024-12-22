@@ -97,10 +97,12 @@ model Voucher {
 model Event {
   id            Int       @id @default(autoincrement())
   title         String
+  name          String
   description   String    @db.Text()
   thumbnail     String
   address       String
   userId        Int
+  category      String
   price         Int?
   availableSeat Int
   content       String    @db.Text()
@@ -110,24 +112,7 @@ model Event {
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
 
-  schedule      Schedule[]
-  review        Review[]
-  eventTicket   EventTicket[]
-  eventCategory EventCategory[]
-
   @@map("events")
-}
-
-model Schedule {
-  id        Int      @id @default(autoincrement())
-  eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
-  startTime DateTime
-  endTime   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("schedules")
 }
 
 model Review {
@@ -135,7 +120,6 @@ model Review {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
   rating    Int
   comment   String
   createdAt DateTime @default(now())
@@ -172,15 +156,14 @@ enum Status {
 }
 
 model EventTicket {
-  id        Int      @id @default(autoincrement())
-  eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
-  type      Type
-  price     Float
-  quantity  Int
-  sold      Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  eventId       Int
+  type          Type
+  price         Float
+  availableseat Int
+  sold          Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("event_tickets")
 }
@@ -189,24 +172,4 @@ enum Type {
   VVIP
   VIP
   REGULER
-}
-
-model EventCategory {
-  id         Int      @id @default(autoincrement())
-  eventId    Int
-  event      Event    @relation(fields: [eventId], references: [id])
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  @@map("event_categories")
-}
-
-model Category {
-  id            Int             @id @default(autoincrement())
-  name          String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  eventCategory EventCategory[]
-
-  @@map("categories")
 }
