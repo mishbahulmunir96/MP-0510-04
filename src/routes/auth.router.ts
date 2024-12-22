@@ -1,17 +1,19 @@
 import { Router } from "express";
 import {
-  validateForgotPassword,
-  validateLogin,
-  validateRegister,
-  validateResetPassword,
-} from "../validators/auth.validator";
-import {
+  changePasswordController,
   forgotPasswordController,
   loginController,
   registerController,
   resetPasswordController,
 } from "../controllers/auth.controller";
-import { verifyTokenReset } from "../lib/jwt";
+import { verifyToken, verifyTokenReset } from "../lib/jwt";
+import {
+  validateChangePassword,
+  validateForgotPassword,
+  validateLogin,
+  validateRegister,
+  validateResetPassword,
+} from "../validators/auth.validator";
 
 const router = Router();
 
@@ -27,6 +29,12 @@ router.patch(
   verifyTokenReset,
   validateResetPassword,
   resetPasswordController
+);
+router.patch(
+  "/change-password",
+  verifyToken,
+  validateChangePassword,
+  changePasswordController
 );
 
 export default router;

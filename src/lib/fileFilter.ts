@@ -35,4 +35,3 @@ export const fileFilter = async (
   } catch (error) {
     next(error);
   }
-};

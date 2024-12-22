@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -15,29 +10,36 @@ datasource db {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
-  firstName      String
-  lastName       String
-  email          String    @unique
-  password       String
-  phoneNumber    String?
-  address        String?
-  birthDate      DateTime?
-  gender         String?
-  role           Role      @default(USER)
-  profilePicture String?
-  referralCode   String?   @unique
-  isDeleted      Boolean   @default(false)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  firstName        String
+  lastName         String
+  email            String    @unique
+  password         String
+  phoneNumber      String?
+  address          String?
+  birthDate        DateTime?
+  gender           Gender?
+  role             Role      @default(USER)
+  profilePicture   String?
+  referralCode     String?   @unique
+  referredBy       Int?
+  point            Int       @default(0)
+  pointExpiredDate DateTime?
+  isDeleted        Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   notification Notification[]
-  point        Point[]
   coupon       Coupon[]
   voucher      Voucher[]
   event        Event[]
   review       Review[]
   transaction  Transaction[]
+  usedVouchers Voucher[]      @relation("UsedVouchers")
+
+  referredByUser User? @relation("UserReferrals", fields: [referredBy], references: [id])
+
+  referrals User[] @relation("UserReferrals")
 
   @@map("users")
 }
@@ -45,6 +47,11 @@ model User {
 enum Role {
   USER
   ORGANIZER
+}
+
+enum Gender {
+  Male
+  Female
 }
 
 model Notification {
@@ -55,17 +62,6 @@ model Notification {
   user    User    @relation(fields: [userId], references: [id])
 
   @@map("notifications")
-}
-
-model Point {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  points    Int
-  createdAt DateTime @default(now())
-  expiredAt DateTime
-
-  @@map("points")
 }
 
 model Coupon {
@@ -82,15 +78,18 @@ model Coupon {
 }
 
 model Voucher {
-  id            Int           @id @default(autoincrement())
-  userId        Int
-  user          User          @relation(fields: [userId], references: [id])
-  discountValue Float
-  voucherCode   String
-  isUsed        Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  expiryDate    DateTime
-  transaction   Transaction[]
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  user         User          @relation(fields: [userId], references: [id])
+  usedByUserId Int?
+  usedByUser   User?         @relation("UsedVouchers", fields: [usedByUserId], references: [id])
+  voucherCode  String
+  qty          Int
+  usedQty      Int           @default(0)
+  value        Int
+  createdAt    DateTime      @default(now())
+  expDate      DateTime
+  transaction  Transaction[]
 
   @@map("vouchers")
 }
@@ -104,17 +103,15 @@ model Event {
   address       String
   userId        Int
   category      String
+  price         Int?
+  availableSeat Int
   content       String    @db.Text()
   user          User      @relation(fields: [userId], references: [id])
   startTime     DateTime
   endTime       DateTime
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
-  price         Int
-  availableSeat Int
 
-  review      Review[]
-  eventTicket EventTicket[]
 
   @@map("events")
 }

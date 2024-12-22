@@ -33,6 +33,7 @@ export const verifyToken = (
     next();
   });
 };
+
 export const verifyTokenReset = (
   req: Request,
   res: Response,

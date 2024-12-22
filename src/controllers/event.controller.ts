@@ -56,7 +56,3 @@ export const createEventController = async (
   }
 };
 
-
-
-
-

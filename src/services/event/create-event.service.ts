@@ -35,7 +35,7 @@ export const createEventService = async (
     return await prisma.event.create({
       data: {
         price: Number(price),
-        
+
         availableSeat: Number(availableSeat),
         startTime: new Date(startTime),
         endTime: new Date(endTime),
