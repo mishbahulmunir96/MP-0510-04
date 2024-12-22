@@ -24,12 +24,12 @@ export const updateUserController = async (
   next: NextFunction
 ) => {
   try {
-    const profilePicture = req.file as Express.Multer.File; // Mengambil file gambar
-    const userId = res.locals.user.id; // Mengambil id pengguna dari token
+    const profilePicture = req.file as Express.Multer.File;
+    const userId = res.locals.user.id;
 
     const result = await updateUserService(userId, {
       ...req.body,
-      profilePicture, // Mengirimkan gambar yang di-upload
+      profilePicture,
     });
 
     res.status(200).json(result);

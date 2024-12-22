@@ -25,7 +25,6 @@ export const updateUserService = async (id: number, body: UpdateUserBody) => {
       birthDate,
     } = body;
 
-    // Cek jika ada pengguna yang menggunakan email ini
     if (email) {
       const existingUser = await prisma.user.findFirst({
         where: { email, id: { not: id } },
@@ -36,7 +35,6 @@ export const updateUserService = async (id: number, body: UpdateUserBody) => {
       }
     }
 
-    // Ambil data pengguna saat ini
     const currentUser = await prisma.user.findUnique({
       where: { id },
     });
@@ -45,17 +43,14 @@ export const updateUserService = async (id: number, body: UpdateUserBody) => {
       throw new Error("User not found");
     }
 
-    let secureUrl = currentUser.profilePicture || null; // Default jika tidak ada gambar baru
-
-    // Jika ada gambar baru, upload ke Cloudinary
+    let secureUrl = currentUser.profilePicture || null;
     if (profilePicture) {
-      // Hapus gambar sebelumnya jika ada
       if (currentUser.profilePicture) {
         await cloudinaryRemove(currentUser.profilePicture);
       }
 
       const { secure_url } = await cloudinaryUpload(profilePicture);
-      secureUrl = secure_url; // Update URL gambar
+      secureUrl = secure_url;
     }
 
     let parsedDate = null;
@@ -66,7 +61,6 @@ export const updateUserService = async (id: number, body: UpdateUserBody) => {
       }
     }
 
-    // Update data pengguna di database
     return await prisma.user.update({
       where: { id },
       data: {
