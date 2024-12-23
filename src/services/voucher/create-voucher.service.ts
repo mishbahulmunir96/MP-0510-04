@@ -20,6 +20,7 @@ export const createVoucherService = async (body: Voucher, userId: number) => {
         value: body.value,
         expDate: new Date(body.expDate),
         userId: userId,
+        eventId: body.eventId,
       },
     });
 
