@@ -9,18 +9,7 @@ export const createVoucherController = async (
   next: NextFunction
 ) => {
   try {
-    const user = res.locals.user;
-    const userId = user.id;
-    const userRole = user.role;
-
-    // user role protection, only ORGANIZER can create vocuher
-    if (userRole !== Role.ORGANIZER) {
-      res.status(403).json({
-        status: "error",
-        message: "Access denied. Only ORGANIZER can create voucher.",
-      });
-      return;
-    }
+    const userId = res.locals.user.id;
 
     const result = await createVoucherService(req.body, userId);
 
@@ -36,18 +25,7 @@ export const getVouchersController = async (
   next: NextFunction
 ) => {
   try {
-    const user = res.locals.user;
-    const userId = user.id;
-    const userRole = user.role;
-
-    // user role protection, only ORGANIZER can get vocuher data
-    if (userRole !== Role.ORGANIZER) {
-      res.status(403).json({
-        status: "error",
-        message: "Access denied. Only ORGANIZER can view vouchers.",
-      });
-      return;
-    }
+    const userId = res.locals.user.id;
 
     const result = await getVouchersService(userId);
 
