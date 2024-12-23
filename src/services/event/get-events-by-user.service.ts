@@ -1,10 +1,9 @@
 import prisma from "../../lib/prisma";
 
-export const getVouchersService = async (userId: number) => {
+export const getEventsByUserService = async (userId: number) => {
   try {
-    return await prisma.voucher.findMany({
+    return await prisma.event.findMany({
       where: { userId: userId },
-      include: { event: true },
     });
   } catch (error) {
     throw error;
