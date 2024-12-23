@@ -4,6 +4,8 @@ import { createEventService } from "../services/event/create-event.service";
 import { getEventService } from "../services/event/get-event.service";
 import { getEventsByUserService } from "../services/event/get-events-by-user.service";
 import { Role } from "../../prisma/generated/client";
+import { updateEventService } from "../services/event/update-event.service";
+import prisma from "../lib/prisma";
 
 export const getEventsController = async (
   req: Request,
@@ -31,18 +33,7 @@ export const getEventsByUserController = async (
   next: NextFunction
 ) => {
   try {
-    const user = res.locals.user;
-    const userId = user.id;
-    const userRole = user.role;
-
-    // user role protection, only ORGANIZER can get vocuher data
-    if (userRole !== Role.ORGANIZER) {
-      res.status(403).json({
-        status: "error",
-        message: "Access denied. Only ORGANIZER can view their events.",
-      });
-      return;
-    }
+    const userId = res.locals.user.id;
 
     const result = await getEventsByUserService(userId);
 
@@ -90,5 +81,46 @@ export const createEventController = async (
     res.status(200).send(result);
   } catch (error) {
     next(error);
+  }
+};
+
+export const updateEventController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const thumbnail = req.file as Express.Multer.File;
+    const eventId = Number(req.params.id);
+    const userId = res.locals.user.id;
+
+    // Ambil event untuk memeriksa pemiliknya
+    const currentEvent = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!currentEvent) {
+      res.status(404).json({ status: "error", message: "Event not found." });
+      return;
+    }
+
+    // Cek apakah pemilik event adalah user yang sedang mengedit
+    if (currentEvent.userId !== userId) {
+      res.status(403).json({
+        status: "error",
+        message: "You are not authorized to edit this event.",
+      });
+      return;
+    }
+
+    // Jika pemilik sama, lanjutkan untuk memperbarui event
+    const result = await updateEventService(eventId, {
+      ...req.body,
+      thumbnail,
+    });
+
+    res.status(200).json({ status: "success", data: result }); // Kembalikan respons yang sesuai
+  } catch (error) {
+    next(error); // Lewatkan kesalahan ke middleware error handler
   }
 };
