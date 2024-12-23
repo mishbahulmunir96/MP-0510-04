@@ -78,18 +78,21 @@ model Coupon {
 }
 
 model Voucher {
-  id           Int           @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   userId       Int
-  user         User          @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
   usedByUserId Int?
-  usedByUser   User?         @relation("UsedVouchers", fields: [usedByUserId], references: [id])
+  usedByUser   User?    @relation("UsedVouchers", fields: [usedByUserId], references: [id])
   voucherCode  String
   qty          Int
-  usedQty      Int           @default(0)
+  usedQty      Int      @default(0)
   value        Int
-  createdAt    DateTime      @default(now())
+  eventId      Int
+  createdAt    DateTime @default(now())
   expDate      DateTime
-  transaction  Transaction[]
+
+  event       Event         @relation(fields: [eventId], references: [id])
+  transaction Transaction[]
 
   @@map("vouchers")
 }
@@ -111,6 +114,7 @@ model Event {
   endTime       DateTime
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
+  Voucher       Voucher[]
 
   @@map("events")
 }

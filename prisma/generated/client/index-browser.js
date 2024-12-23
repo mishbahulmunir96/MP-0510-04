@@ -163,6 +163,7 @@ exports.Prisma.VoucherScalarFieldEnum = {
   qty: 'qty',
   usedQty: 'usedQty',
   value: 'value',
+  eventId: 'eventId',
   createdAt: 'createdAt',
   expDate: 'expDate'
 };

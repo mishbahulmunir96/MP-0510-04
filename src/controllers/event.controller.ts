@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { getEventsService } from "../services/event/get-events.service";
 import { createEventService } from "../services/event/create-event.service";
 import { getEventService } from "../services/event/get-event.service";
+import { getEventsByUserService } from "../services/event/get-events-by-user.service";
+import { Role } from "../../prisma/generated/client";
 
 export const getEventsController = async (
   req: Request,
@@ -23,6 +25,42 @@ export const getEventsController = async (
   }
 };
 
+export const getEventsByUserController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = res.locals.user;
+    const userId = user.id;
+    const userRole = user.role;
+
+    // user role protection, only ORGANIZER can get vocuher data
+    if (userRole !== Role.ORGANIZER) {
+      res.status(403).json({
+        status: "error",
+        message: "Access denied. Only ORGANIZER can view their events.",
+      });
+      return;
+    }
+
+    const result = await getEventsByUserService(userId);
+
+    if (result.length === 0) {
+      res.status(404).json({
+        status: "success",
+        message: "No events found.",
+      });
+
+      return;
+    }
+
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getEventController = async (
   req: Request,
   res: Response,
@@ -36,7 +74,6 @@ export const getEventController = async (
     next(error);
   }
 };
-
 
 export const createEventController = async (
   req: Request,
@@ -55,4 +92,3 @@ export const createEventController = async (
     next(error);
   }
 };
-
