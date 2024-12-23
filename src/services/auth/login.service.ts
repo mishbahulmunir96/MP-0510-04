@@ -1,8 +1,8 @@
-import { User } from "@prisma/client";
 import { comparePassword } from "../../lib/argon";
 import { sign } from "jsonwebtoken";
 import { JWT_SECRET_KEY } from "../../config";
 import prisma from "../../lib/prisma";
+import { User } from "../../../prisma/generated/client";
 
 interface Body extends Pick<User, "email" | "password"> {}
 
