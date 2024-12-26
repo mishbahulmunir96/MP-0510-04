@@ -23,6 +23,7 @@ router.get("/:id", getEventController);
 router.post(
   "/create-event",
   verifyToken,
+  checkUserRole,
   uploader().fields([{ name: "thumbnail", maxCount: 1 }]),
   fileFilter,
   validateCreateEvent,
