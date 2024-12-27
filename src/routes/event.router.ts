@@ -4,13 +4,13 @@ import {
   getEventController,
   getEventsByUserController,
   getEventsController,
-  updateEventController,
+  // updateEventController,
 } from "../controllers/event.controller";
 import { uploader } from "../lib/multer";
 import { fileFilter } from "../lib/fileFilter";
 import {
   validateCreateEvent,
-  validateUpdateEvent,
+  // validateUpdateEvent,
 } from "../validators/event.validator";
 import { verifyToken } from "../lib/jwt";
 import { checkUserRole } from "../lib/checkUserRole";
@@ -23,6 +23,7 @@ router.get("/:id", getEventController);
 router.post(
   "/create-event",
   verifyToken,
+
   uploader().fields([{ name: "thumbnail", maxCount: 1 }]),
   fileFilter,
   validateCreateEvent,
@@ -33,8 +34,8 @@ router.patch(
   verifyToken,
   uploader().single("thumbnail"),
   fileFilter,
-  validateUpdateEvent,
-  updateEventController
+  // validateUpdateEvent,
+  // updateEventController
 );
 
 export default router;
