@@ -40,13 +40,6 @@ const getEventsByUserController = (req, res, next) => __awaiter(void 0, void 0, 
     try {
         const userId = res.locals.user.id;
         const result = yield (0, get_events_by_user_service_1.getEventsByUserService)(userId);
-        if (result.length === 0) {
-            res.status(404).json({
-                status: "success",
-                message: "No events found.",
-            });
-            return;
-        }
         res.status(200).send(result);
     }
     catch (error) {

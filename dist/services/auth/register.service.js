@@ -13,12 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerService = void 0;
-const argon_1 = require("../../lib/argon");
-const generateReferralcode_1 = require("../../lib/generateReferralcode");
-const generateCouponCode_1 = require("../../lib/generateCouponCode");
 const date_fns_1 = require("date-fns");
+const argon_1 = require("../../lib/argon");
+const generateCouponCode_1 = require("../../lib/generateCouponCode");
+const generateReferralcode_1 = require("../../lib/generateReferralcode");
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const client_1 = require("../../../prisma/generated/client");
 const registerService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { firstName, lastName, email, phoneNumber, role, password, referralCode, } = body;
@@ -55,7 +54,7 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
                 lastName,
                 email,
                 phoneNumber,
-                role: role !== null && role !== void 0 ? role : client_1.Role.USER,
+                role,
                 password: hashedPassword,
                 referralCode: newReferralcode,
                 referredBy,
