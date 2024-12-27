@@ -37,15 +37,6 @@ export const getEventsByUserController = async (
 
     const result = await getEventsByUserService(userId);
 
-    if (result.length === 0) {
-      res.status(404).json({
-        status: "success",
-        message: "No events found.",
-      });
-
-      return;
-    }
-
     res.status(200).send(result);
   } catch (error) {
     next(error);

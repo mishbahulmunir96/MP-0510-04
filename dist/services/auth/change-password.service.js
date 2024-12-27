@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.changePasswordService = void 0;
-const argon_1 = require("../../lib/argon"); // Impor fungsi hash yang sudah ada
+const argon_1 = require("../../lib/argon");
 const prisma_1 = __importDefault(require("../../lib/prisma"));
 const argon_2 = require("../../lib/argon");
 const changePasswordService = (userId, currentPassword, newPassword) => __awaiter(void 0, void 0, void 0, function* () {

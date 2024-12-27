@@ -18,12 +18,11 @@ import { checkUserRole } from "../lib/checkUserRole";
 const router = Router();
 
 router.get("/", getEventsController);
-router.get("/byuser", verifyToken, checkUserRole, getEventsByUserController); // add by MISBAH
+router.get("/byuser", verifyToken, getEventsByUserController);
 router.get("/:id", getEventController);
 router.post(
   "/create-event",
   verifyToken,
-  checkUserRole,
   uploader().fields([{ name: "thumbnail", maxCount: 1 }]),
   fileFilter,
   validateCreateEvent,
@@ -32,7 +31,6 @@ router.post(
 router.patch(
   "/update-event/:id",
   verifyToken,
-  checkUserRole,
   uploader().single("thumbnail"),
   fileFilter,
   validateUpdateEvent,

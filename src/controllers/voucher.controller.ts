@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { createVoucherService } from "../services/voucher/create-voucher.service";
 import { getVouchersService } from "../services/voucher/get-vouchers.service";
-import { Role } from "../../prisma/generated/client";
 
 export const createVoucherController = async (
   req: Request,

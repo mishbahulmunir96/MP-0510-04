@@ -9,6 +9,7 @@ const config_1 = require("./config");
 const auth_router_1 = __importDefault(require("./routes/auth.router"));
 const event_router_1 = __importDefault(require("./routes/event.router"));
 const user_router_1 = __importDefault(require("./routes/user.router"));
+const voucher_router_1 = __importDefault(require("./routes/voucher.router"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -16,6 +17,7 @@ app.use(express_1.default.json());
 app.use("/auth", auth_router_1.default);
 app.use("/users", user_router_1.default);
 app.use("/events", event_router_1.default);
+app.use("/vouchers", voucher_router_1.default);
 // middleware error
 app.use((err, req, res, next) => {
     // melihat error di console
