@@ -17,8 +17,7 @@ const prisma_1 = __importDefault(require("../../lib/prisma"));
 const cloudinary_1 = require("../../lib/cloudinary");
 const updateUserService = (id, body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { firstName, lastName, email, phoneNumber, address, profilePicture, gender, birthDate, } = body;
-        // Cek jika ada pengguna yang menggunakan email ini
+        const { firstName, lastName, email, phoneNumber, address, profilePicture, gender, birthDate, role, } = body;
         if (email) {
             const existingUser = yield prisma_1.default.user.findFirst({
                 where: { email, id: { not: id } },
@@ -27,22 +26,19 @@ const updateUserService = (id, body) => __awaiter(void 0, void 0, void 0, functi
                 throw new Error("Email already in use!");
             }
         }
-        // Ambil data pengguna saat ini
         const currentUser = yield prisma_1.default.user.findUnique({
             where: { id },
         });
         if (!currentUser) {
             throw new Error("User not found");
         }
-        let secureUrl = currentUser.profilePicture || null; // Default jika tidak ada gambar baru
-        // Jika ada gambar baru, upload ke Cloudinary
+        let secureUrl = currentUser.profilePicture || null;
         if (profilePicture) {
-            // Hapus gambar sebelumnya jika ada
             if (currentUser.profilePicture) {
                 yield (0, cloudinary_1.cloudinaryRemove)(currentUser.profilePicture);
             }
             const { secure_url } = yield (0, cloudinary_1.cloudinaryUpload)(profilePicture);
-            secureUrl = secure_url; // Update URL gambar
+            secureUrl = secure_url;
         }
         let parsedDate = null;
         if (birthDate) {
@@ -51,7 +47,6 @@ const updateUserService = (id, body) => __awaiter(void 0, void 0, void 0, functi
                 throw new Error("Invalid date format");
             }
         }
-        // Update data pengguna di database
         return yield prisma_1.default.user.update({
             where: { id },
             data: {
@@ -63,6 +58,7 @@ const updateUserService = (id, body) => __awaiter(void 0, void 0, void 0, functi
                 profilePicture: secureUrl,
                 gender,
                 birthDate: parsedDate,
+                role,
             },
         });
     }

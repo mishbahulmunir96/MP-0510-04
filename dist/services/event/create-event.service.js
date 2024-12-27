@@ -17,7 +17,7 @@ const cloudinary_1 = require("../../lib/cloudinary");
 const prisma_1 = __importDefault(require("../../lib/prisma"));
 const createEventService = (body, thumbnail, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title } = body;
+        const { title, price, availableSeat, endTime, startTime } = body;
         const event = yield prisma_1.default.event.findFirst({
             where: { title },
         });
@@ -25,9 +25,21 @@ const createEventService = (body, thumbnail, userId) => __awaiter(void 0, void 0
             throw new Error("Title already in use");
         }
         const { secure_url } = yield (0, cloudinary_1.cloudinaryUpload)(thumbnail);
-
         return yield prisma_1.default.event.create({
-          data: Object.assign(Object.assign({}, body), { thumbnail: secure_url, userId: userId }),
+            data: {
+                price: Number(price),
+                availableSeat: Number(availableSeat),
+                startTime: new Date(startTime),
+                endTime: new Date(endTime),
+                thumbnail: secure_url,
+                userId: userId,
+                title,
+                name: body.name,
+                address: body.address,
+                category: body.category,
+                content: body.content,
+                description: body.description,
+            },
         });
     }
     catch (error) {

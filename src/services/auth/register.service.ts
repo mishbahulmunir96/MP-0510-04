@@ -1,9 +1,9 @@
-import { hashPassword } from "../../lib/argon";
-import { generateReferralCode } from "../../lib/generateReferralcode";
-import { generateCouponCode } from "../../lib/generateCouponCode";
 import { addDays } from "date-fns";
+import { User } from "../../../prisma/generated/client";
+import { hashPassword } from "../../lib/argon";
+import { generateCouponCode } from "../../lib/generateCouponCode";
+import { generateReferralCode } from "../../lib/generateReferralcode";
 import prisma from "../../lib/prisma";
-import { Role, User } from "../../../prisma/generated/client";
 
 export const registerService = async (body: User) => {
   try {
@@ -56,7 +56,7 @@ export const registerService = async (body: User) => {
         lastName,
         email,
         phoneNumber,
-        role: role ?? Role.USER,
+        role,
         password: hashedPassword,
         referralCode: newReferralcode,
         referredBy,
