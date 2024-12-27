@@ -171,8 +171,6 @@ exports.Prisma.VoucherScalarFieldEnum = {
 exports.Prisma.EventScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  name: 'name',
-  description: 'description',
   thumbnail: 'thumbnail',
   address: 'address',
   userId: 'userId',

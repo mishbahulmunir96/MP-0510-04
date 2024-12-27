@@ -6088,8 +6088,6 @@ export namespace Prisma {
   export type EventMinAggregateOutputType = {
     id: number | null
     title: string | null
-    name: string | null
-    description: string | null
     thumbnail: string | null
     address: string | null
     userId: number | null
@@ -6106,8 +6104,6 @@ export namespace Prisma {
   export type EventMaxAggregateOutputType = {
     id: number | null
     title: string | null
-    name: string | null
-    description: string | null
     thumbnail: string | null
     address: string | null
     userId: number | null
@@ -6124,8 +6120,6 @@ export namespace Prisma {
   export type EventCountAggregateOutputType = {
     id: number
     title: number
-    name: number
-    description: number
     thumbnail: number
     address: number
     userId: number
@@ -6158,8 +6152,6 @@ export namespace Prisma {
   export type EventMinAggregateInputType = {
     id?: true
     title?: true
-    name?: true
-    description?: true
     thumbnail?: true
     address?: true
     userId?: true
@@ -6176,8 +6168,6 @@ export namespace Prisma {
   export type EventMaxAggregateInputType = {
     id?: true
     title?: true
-    name?: true
-    description?: true
     thumbnail?: true
     address?: true
     userId?: true
@@ -6194,8 +6184,6 @@ export namespace Prisma {
   export type EventCountAggregateInputType = {
     id?: true
     title?: true
-    name?: true
-    description?: true
     thumbnail?: true
     address?: true
     userId?: true
@@ -6299,8 +6287,6 @@ export namespace Prisma {
   export type EventGroupByOutputType = {
     id: number
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     userId: number
@@ -6336,8 +6322,6 @@ export namespace Prisma {
   export type EventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
-    name?: boolean
-    description?: boolean
     thumbnail?: boolean
     address?: boolean
     userId?: boolean
@@ -6357,8 +6341,6 @@ export namespace Prisma {
   export type EventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
-    name?: boolean
-    description?: boolean
     thumbnail?: boolean
     address?: boolean
     userId?: boolean
@@ -6376,8 +6358,6 @@ export namespace Prisma {
   export type EventSelectScalar = {
     id?: boolean
     title?: boolean
-    name?: boolean
-    description?: boolean
     thumbnail?: boolean
     address?: boolean
     userId?: boolean
@@ -6409,8 +6389,6 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       title: string
-      name: string
-      description: string
       thumbnail: string
       address: string
       userId: number
@@ -6819,8 +6797,6 @@ export namespace Prisma {
   interface EventFieldRefs {
     readonly id: FieldRef<"Event", 'Int'>
     readonly title: FieldRef<"Event", 'String'>
-    readonly name: FieldRef<"Event", 'String'>
-    readonly description: FieldRef<"Event", 'String'>
     readonly thumbnail: FieldRef<"Event", 'String'>
     readonly address: FieldRef<"Event", 'String'>
     readonly userId: FieldRef<"Event", 'Int'>
@@ -10299,8 +10275,6 @@ export namespace Prisma {
   export const EventScalarFieldEnum: {
     id: 'id',
     title: 'title',
-    name: 'name',
-    description: 'description',
     thumbnail: 'thumbnail',
     address: 'address',
     userId: 'userId',
@@ -10873,8 +10847,6 @@ export namespace Prisma {
     NOT?: EventWhereInput | EventWhereInput[]
     id?: IntFilter<"Event"> | number
     title?: StringFilter<"Event"> | string
-    name?: StringFilter<"Event"> | string
-    description?: StringFilter<"Event"> | string
     thumbnail?: StringFilter<"Event"> | string
     address?: StringFilter<"Event"> | string
     userId?: IntFilter<"Event"> | number
@@ -10893,8 +10865,6 @@ export namespace Prisma {
   export type EventOrderByWithRelationInput = {
     id?: SortOrder
     title?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
     thumbnail?: SortOrder
     address?: SortOrder
     userId?: SortOrder
@@ -10916,8 +10886,6 @@ export namespace Prisma {
     OR?: EventWhereInput[]
     NOT?: EventWhereInput | EventWhereInput[]
     title?: StringFilter<"Event"> | string
-    name?: StringFilter<"Event"> | string
-    description?: StringFilter<"Event"> | string
     thumbnail?: StringFilter<"Event"> | string
     address?: StringFilter<"Event"> | string
     userId?: IntFilter<"Event"> | number
@@ -10936,8 +10904,6 @@ export namespace Prisma {
   export type EventOrderByWithAggregationInput = {
     id?: SortOrder
     title?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
     thumbnail?: SortOrder
     address?: SortOrder
     userId?: SortOrder
@@ -10962,8 +10928,6 @@ export namespace Prisma {
     NOT?: EventScalarWhereWithAggregatesInput | EventScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Event"> | number
     title?: StringWithAggregatesFilter<"Event"> | string
-    name?: StringWithAggregatesFilter<"Event"> | string
-    description?: StringWithAggregatesFilter<"Event"> | string
     thumbnail?: StringWithAggregatesFilter<"Event"> | string
     address?: StringWithAggregatesFilter<"Event"> | string
     userId?: IntWithAggregatesFilter<"Event"> | number
@@ -11575,8 +11539,6 @@ export namespace Prisma {
 
   export type EventCreateInput = {
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     category: string
@@ -11594,8 +11556,6 @@ export namespace Prisma {
   export type EventUncheckedCreateInput = {
     id?: number
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     userId: number
@@ -11612,8 +11572,6 @@ export namespace Prisma {
 
   export type EventUpdateInput = {
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
@@ -11631,8 +11589,6 @@ export namespace Prisma {
   export type EventUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     userId?: IntFieldUpdateOperationsInput | number
@@ -11650,8 +11606,6 @@ export namespace Prisma {
   export type EventCreateManyInput = {
     id?: number
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     userId: number
@@ -11667,8 +11621,6 @@ export namespace Prisma {
 
   export type EventUpdateManyMutationInput = {
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
@@ -11684,8 +11636,6 @@ export namespace Prisma {
   export type EventUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     userId?: IntFieldUpdateOperationsInput | number
@@ -12442,8 +12392,6 @@ export namespace Prisma {
   export type EventCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
     thumbnail?: SortOrder
     address?: SortOrder
     userId?: SortOrder
@@ -12467,8 +12415,6 @@ export namespace Prisma {
   export type EventMaxOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
     thumbnail?: SortOrder
     address?: SortOrder
     userId?: SortOrder
@@ -12485,8 +12431,6 @@ export namespace Prisma {
   export type EventMinOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
-    name?: SortOrder
-    description?: SortOrder
     thumbnail?: SortOrder
     address?: SortOrder
     userId?: SortOrder
@@ -13719,8 +13663,6 @@ export namespace Prisma {
 
   export type EventCreateWithoutUserInput = {
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     category: string
@@ -13737,8 +13679,6 @@ export namespace Prisma {
   export type EventUncheckedCreateWithoutUserInput = {
     id?: number
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     category: string
@@ -14091,8 +14031,6 @@ export namespace Prisma {
     NOT?: EventScalarWhereInput | EventScalarWhereInput[]
     id?: IntFilter<"Event"> | number
     title?: StringFilter<"Event"> | string
-    name?: StringFilter<"Event"> | string
-    description?: StringFilter<"Event"> | string
     thumbnail?: StringFilter<"Event"> | string
     address?: StringFilter<"Event"> | string
     userId?: IntFilter<"Event"> | number
@@ -14663,8 +14601,6 @@ export namespace Prisma {
 
   export type EventCreateWithoutVoucherInput = {
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     category: string
@@ -14681,8 +14617,6 @@ export namespace Prisma {
   export type EventUncheckedCreateWithoutVoucherInput = {
     id?: number
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     userId: number
@@ -14879,8 +14813,6 @@ export namespace Prisma {
 
   export type EventUpdateWithoutVoucherInput = {
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
@@ -14897,8 +14829,6 @@ export namespace Prisma {
   export type EventUncheckedUpdateWithoutVoucherInput = {
     id?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     userId?: IntFieldUpdateOperationsInput | number
@@ -15453,8 +15383,6 @@ export namespace Prisma {
   export type EventCreateManyUserInput = {
     id?: number
     title: string
-    name: string
-    description: string
     thumbnail: string
     address: string
     category: string
@@ -15602,8 +15530,6 @@ export namespace Prisma {
 
   export type EventUpdateWithoutUserInput = {
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
@@ -15620,8 +15546,6 @@ export namespace Prisma {
   export type EventUncheckedUpdateWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
@@ -15638,8 +15562,6 @@ export namespace Prisma {
   export type EventUncheckedUpdateManyWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
     thumbnail?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
