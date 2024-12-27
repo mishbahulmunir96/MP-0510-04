@@ -6,6 +6,7 @@ const multer_1 = require("../lib/multer");
 const fileFilter_1 = require("../lib/fileFilter");
 const event_validator_1 = require("../validators/event.validator");
 const jwt_1 = require("../lib/jwt");
+const checkUserRole_1 = require("../lib/checkUserRole");
 const router = (0, express_1.Router)();
 router.get("/", event_controller_1.getEventsController);
 router.get("/byuser", jwt_1.verifyToken, event_controller_1.getEventsByUserController);
