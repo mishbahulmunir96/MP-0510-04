@@ -4,7 +4,6 @@ exports.validateUpdateEvent = exports.validateCreateEvent = void 0;
 const express_validator_1 = require("express-validator");
 exports.validateCreateEvent = [
     (0, express_validator_1.body)("title").notEmpty().withMessage("Title is required"),
-    (0, express_validator_1.body)("description").notEmpty().withMessage("Description is required"),
     (0, express_validator_1.body)("content").notEmpty().withMessage("Content is required"),
     (0, express_validator_1.body)("category").notEmpty().withMessage("Category is required"),
     (0, express_validator_1.body)("address").notEmpty().withMessage("address is required"),
@@ -23,10 +22,6 @@ exports.validateCreateEvent = [
 ];
 exports.validateUpdateEvent = [
     (0, express_validator_1.body)("title").optional().notEmpty().withMessage("Title is required"),
-    (0, express_validator_1.body)("description")
-        .optional()
-        .notEmpty()
-        .withMessage("Description is required"),
     (0, express_validator_1.body)("content").optional().notEmpty().withMessage("Content is required"),
     (0, express_validator_1.body)("category").optional().notEmpty().withMessage("Category is required"),
     (0, express_validator_1.body)("address").optional().notEmpty().withMessage("Address is required"),

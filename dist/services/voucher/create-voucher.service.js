@@ -12,36 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createEventService = void 0;
-const cloudinary_1 = require("../../lib/cloudinary");
+exports.createVoucherService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const createEventService = (body, thumbnail, userId) => __awaiter(void 0, void 0, void 0, function* () {
+const createVoucherService = (body, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, price, availableSeat, endTime, startTime, content, address } = body;
-        const event = yield prisma_1.default.event.findFirst({
-            where: { title },
-        });
-        if (event) {
-            throw new Error("Title already in use");
-        }
-        const { secure_url } = yield (0, cloudinary_1.cloudinaryUpload)(thumbnail);
-        return yield prisma_1.default.event.create({
-            data: {
-                userId: userId,
-                price: Number(price),
-                availableSeat: Number(availableSeat),
-                startTime: new Date(startTime),
-                endTime: new Date(endTime),
-                thumbnail: secure_url,
-                title,
-                address: body.address,
-                category: body.category,
-                content: body.content
+        const existingVoucher = yield prisma_1.default.voucher.findFirst({
+            where: {
+                voucherCode: body.voucherCode,
             },
         });
+        if (existingVoucher) {
+            throw new Error("Voucher Code is Already exist");
+        }
+        const newData = yield prisma_1.default.voucher.create({
+            data: {
+                voucherCode: body.voucherCode,
+                qty: body.qty,
+                value: body.value,
+                expDate: new Date(body.expDate),
+                userId: userId,
+                eventId: body.eventId,
+            },
+        });
+        return newData;
     }
     catch (error) {
         throw error;
     }
 });
-exports.createEventService = createEventService;
+exports.createVoucherService = createVoucherService;
