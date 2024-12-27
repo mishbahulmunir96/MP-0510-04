@@ -19,7 +19,7 @@ model User {
   address          String?
   birthDate        DateTime?
   gender           Gender?
-  role             Role      @default(USER)
+  role             Role
   profilePicture   String?
   referralCode     String?   @unique
   referredBy       Int?

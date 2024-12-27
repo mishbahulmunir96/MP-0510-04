@@ -11171,7 +11171,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -11200,7 +11200,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -11286,7 +11286,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -13806,7 +13806,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -13834,7 +13834,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -13866,7 +13866,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -13894,7 +13894,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -14236,7 +14236,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -14264,7 +14264,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -14362,7 +14362,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -14390,7 +14390,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -14488,7 +14488,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -14516,7 +14516,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -14548,7 +14548,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -14576,7 +14576,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -14867,7 +14867,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -14895,7 +14895,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -15044,7 +15044,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -15072,7 +15072,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -15170,7 +15170,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number
@@ -15198,7 +15198,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     referredBy?: number | null
@@ -15438,7 +15438,7 @@ export namespace Prisma {
     address?: string | null
     birthDate?: Date | string | null
     gender?: $Enums.Gender | null
-    role?: $Enums.Role
+    role: $Enums.Role
     profilePicture?: string | null
     referralCode?: string | null
     point?: number

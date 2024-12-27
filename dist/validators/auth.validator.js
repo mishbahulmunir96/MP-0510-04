@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-
 exports.validateChangePassword = exports.validateResetPassword = exports.validateForgotPassword = exports.validateLogin = exports.validateRegister = void 0;
 const express_validator_1 = require("express-validator");
 exports.validateRegister = [
@@ -30,7 +29,6 @@ exports.validateRegister = [
     (req, res, next) => {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
-
             res.status(400).send({ errors: errors.array()[0].msg });
             return;
         }
@@ -71,7 +69,6 @@ exports.validateResetPassword = [
         next();
     },
 ];
-
 exports.validateChangePassword = [
     (0, express_validator_1.body)("currentPassword")
         .notEmpty()
@@ -91,4 +88,3 @@ exports.validateChangePassword = [
         return true;
     }),
 ];
-

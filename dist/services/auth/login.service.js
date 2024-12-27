@@ -42,7 +42,9 @@ const loginService = (body) => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error("Incorrect password");
         }
         const { password: pass } = user, userWithoutPassword = __rest(user, ["password"]);
-        const token = (0, jsonwebtoken_1.sign)({ id: user.id }, config_1.JWT_SECRET_KEY, { expiresIn: "2h" });
+        const token = (0, jsonwebtoken_1.sign)({ id: user.id, role: user.role }, config_1.JWT_SECRET_KEY, {
+            expiresIn: "2h",
+        });
         return Object.assign(Object.assign({}, userWithoutPassword), { token });
     }
     catch (error) {
