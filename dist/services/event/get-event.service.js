@@ -12,36 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createEventService = void 0;
-const cloudinary_1 = require("../../lib/cloudinary");
+exports.getEventService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const createEventService = (body, thumbnail, userId) => __awaiter(void 0, void 0, void 0, function* () {
+const getEventService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, price, availableSeat, endTime, startTime, content, address } = body;
         const event = yield prisma_1.default.event.findFirst({
-            where: { title },
+            where: { id },
+            include: { user: { select: { firstName: true } } },
         });
-        if (event) {
-            throw new Error("Title already in use");
+        if (!event) {
+            throw new Error("invalid event id");
         }
-        const { secure_url } = yield (0, cloudinary_1.cloudinaryUpload)(thumbnail);
-        return yield prisma_1.default.event.create({
-            data: {
-                userId: userId,
-                price: Number(price),
-                availableSeat: Number(availableSeat),
-                startTime: new Date(startTime),
-                endTime: new Date(endTime),
-                thumbnail: secure_url,
-                title,
-                address: body.address,
-                category: body.category,
-                content: body.content
-            },
-        });
+        return event;
     }
     catch (error) {
         throw error;
     }
 });
-exports.createEventService = createEventService;
+exports.getEventService = getEventService;

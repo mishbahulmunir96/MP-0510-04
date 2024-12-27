@@ -100,8 +100,6 @@ model Voucher {
 model Event {
   id            Int       @id @default(autoincrement())
   title         String
-  name          String
-  description   String    @db.Text()
   thumbnail     String
   address       String
   userId        Int

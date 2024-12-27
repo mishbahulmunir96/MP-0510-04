@@ -13,12 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateEventController = exports.createEventController = exports.getEventController = exports.getEventsByUserController = exports.getEventsController = void 0;
-const get_events_service_1 = require("../services/event/get-events.service");
+const prisma_1 = __importDefault(require("../lib/prisma"));
 const create_event_service_1 = require("../services/event/create-event.service");
 const get_event_service_1 = require("../services/event/get-event.service");
 const get_events_by_user_service_1 = require("../services/event/get-events-by-user.service");
+const get_events_service_1 = require("../services/event/get-events.service");
 const update_event_service_1 = require("../services/event/update-event.service");
-const prisma_1 = __importDefault(require("../lib/prisma"));
 const getEventsController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const query = {
@@ -75,7 +75,6 @@ const updateEventController = (req, res, next) => __awaiter(void 0, void 0, void
         const thumbnail = req.file;
         const eventId = Number(req.params.id);
         const userId = res.locals.user.id;
-        // Ambil event untuk memeriksa pemiliknya
         const currentEvent = yield prisma_1.default.event.findUnique({
             where: { id: eventId },
         });
@@ -83,7 +82,6 @@ const updateEventController = (req, res, next) => __awaiter(void 0, void 0, void
             res.status(404).json({ status: "error", message: "Event not found." });
             return;
         }
-        // Cek apakah pemilik event adalah user yang sedang mengedit
         if (currentEvent.userId !== userId) {
             res.status(403).json({
                 status: "error",
@@ -91,12 +89,11 @@ const updateEventController = (req, res, next) => __awaiter(void 0, void 0, void
             });
             return;
         }
-        // Jika pemilik sama, lanjutkan untuk memperbarui event
         const result = yield (0, update_event_service_1.updateEventService)(eventId, Object.assign(Object.assign({}, req.body), { thumbnail }));
-        res.status(200).json({ status: "success", data: result }); // Kembalikan respons yang sesuai
+        res.status(200).json({ status: "success", data: result });
     }
     catch (error) {
-        next(error); // Lewatkan kesalahan ke middleware error handler
+        next(error);
     }
 });
 exports.updateEventController = updateEventController;

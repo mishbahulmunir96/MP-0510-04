@@ -18,7 +18,6 @@ const argon_1 = require("../../lib/argon");
 const generateCouponCode_1 = require("../../lib/generateCouponCode");
 const generateReferralcode_1 = require("../../lib/generateReferralcode");
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const client_1 = require("../../../prisma/generated/client");
 const registerService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { firstName, lastName, email, phoneNumber, role, password, referralCode, } = body;
