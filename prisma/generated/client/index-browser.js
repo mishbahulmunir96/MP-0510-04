@@ -196,24 +196,15 @@ exports.Prisma.ReviewScalarFieldEnum = {
 
 exports.Prisma.TransactionScalarFieldEnum = {
   id: 'id',
-  eventTicketId: 'eventTicketId',
+  eventId: 'eventId',
   userId: 'userId',
   voucherId: 'voucherId',
-  totalPrice: 'totalPrice',
+  couponId: 'couponId',
+  amount: 'amount',
+  ticketCount: 'ticketCount',
   pointUse: 'pointUse',
   paymentProof: 'paymentProof',
   status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.EventTicketScalarFieldEnum = {
-  id: 'id',
-  eventId: 'eventId',
-  type: 'type',
-  price: 'price',
-  availableseat: 'availableseat',
-  sold: 'sold',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -251,12 +242,6 @@ exports.Status = exports.$Enums.Status = {
   cancelled: 'cancelled'
 };
 
-exports.Type = exports.$Enums.Type = {
-  VVIP: 'VVIP',
-  VIP: 'VIP',
-  REGULER: 'REGULER'
-};
-
 exports.Prisma.ModelName = {
   User: 'User',
   Notification: 'Notification',
@@ -264,8 +249,7 @@ exports.Prisma.ModelName = {
   Voucher: 'Voucher',
   Event: 'Event',
   Review: 'Review',
-  Transaction: 'Transaction',
-  EventTicket: 'EventTicket'
+  Transaction: 'Transaction'
 };
 
 /**

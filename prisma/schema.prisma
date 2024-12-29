@@ -65,14 +65,15 @@ model Notification {
 }
 
 model Coupon {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  value      Int
-  couponCode String
-  isUsed     Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  expiredAt  DateTime
+  id          Int           @id @default(autoincrement())
+  userId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  value       Int
+  couponCode  String
+  isUsed      Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  expiredAt   DateTime
+  Transaction Transaction[]
 
   @@map("coupons")
 }
@@ -112,7 +113,9 @@ model Event {
   endTime       DateTime
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
-  Voucher       Voucher[]
+
+  voucher     Voucher[]
+  transaction Transaction[]
 
   @@map("events")
 }
@@ -131,19 +134,22 @@ model Review {
 }
 
 model Transaction {
-  id            Int      @id @default(autoincrement())
-  eventTicketId Int
-  userId        Int
-  user          User     @relation(fields: [userId], references: [id])
-  voucherId     Int?
-  voucher       Voucher? @relation(fields: [voucherId], references: [id])
-
-  totalPrice   Float
-  pointUse     Int
-  paymentProof String?
-  status       Status
+  id           Int      @id @default(autoincrement())
+  eventId      Int
+  userId       Int
+  voucherId    Int?
+  couponId     Int?
+  user         User     @relation(fields: [userId], references: [id])
+  voucher      Voucher? @relation(fields: [voucherId], references: [id])
+  amount       Int 
+  ticketCount  Int 
+  pointUse     Int? 
+  paymentProof String? 
+  status       Status?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  event        Event    @relation(fields: [eventId], references: [id])
+  coupon       Coupon?  @relation(fields: [couponId], references: [id])
 
   @@map("transactions")
 }
@@ -154,24 +160,5 @@ enum Status {
   done
   rejected
   expired
-  cancelled
-}
-
-model EventTicket {
-  id            Int      @id @default(autoincrement())
-  eventId       Int
-  type          Type
-  price         Float
-  availableseat Int
-  sold          Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@map("event_tickets")
-}
-
-enum Type {
-  VVIP
-  VIP
-  REGULER
+  cancelled
 }
