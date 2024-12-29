@@ -3,6 +3,7 @@ import { BASE_URL_FRONTEND, JWT_SECRET_FORGOT_PASSWORD } from "../../config";
 import { transporter } from "../../lib/nodemailer";
 import prisma from "../../lib/prisma";
 import { User } from "../../../prisma/generated/client";
+import { resetPasswordTemplate } from "../../lib/resetPasswordEmail";
 
 export const forgotPasswordService = async (body: Pick<User, "email">) => {
   try {
@@ -22,10 +23,12 @@ export const forgotPasswordService = async (body: Pick<User, "email">) => {
 
     const link = `${BASE_URL_FRONTEND}/reset-password/${token}`;
 
+    const emailHtml = resetPasswordTemplate(link);
+
     transporter.sendMail({
       to: email,
       subject: "Link Reset Password",
-      html: `<a href="${link}" target="_blank">${link}</a>`,
+      html: emailHtml,
     });
 
     return { message: "Send email success" };

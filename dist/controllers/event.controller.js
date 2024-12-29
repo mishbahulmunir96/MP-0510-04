@@ -90,7 +90,7 @@ const updateEventController = (req, res, next) => __awaiter(void 0, void 0, void
             return;
         }
         const result = yield (0, update_event_service_1.updateEventService)(eventId, Object.assign(Object.assign({}, req.body), { thumbnail }));
-        res.status(200).json({ status: "success", data: result });
+        res.status(200).json(result);
     }
     catch (error) {
         next(error);
