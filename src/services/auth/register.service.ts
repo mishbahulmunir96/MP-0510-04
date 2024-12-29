@@ -72,7 +72,7 @@ export const registerService = async (body: User) => {
         data: {
           userId: newUser.id,
           couponCode: newCouponcode,
-          value: 10,
+          value: 10000,
           isUsed: false,
           createdAt: new Date(),
           expiredAt: addDays(new Date(), 90),
