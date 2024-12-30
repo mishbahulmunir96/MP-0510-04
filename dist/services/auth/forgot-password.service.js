@@ -17,6 +17,7 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const config_1 = require("../../config");
 const nodemailer_1 = require("../../lib/nodemailer");
 const prisma_1 = __importDefault(require("../../lib/prisma"));
+const resetPasswordEmail_1 = require("../../lib/resetPasswordEmail");
 const forgotPasswordService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = body;
@@ -30,10 +31,11 @@ const forgotPasswordService = (body) => __awaiter(void 0, void 0, void 0, functi
             expiresIn: "20m",
         });
         const link = `${config_1.BASE_URL_FRONTEND}/reset-password/${token}`;
+        const emailHtml = (0, resetPasswordEmail_1.resetPasswordTemplate)(link);
         nodemailer_1.transporter.sendMail({
             to: email,
             subject: "Link Reset Password",
-            html: `<a href="${link}" target="_blank">${link}</a>`,
+            html: emailHtml,
         });
         return { message: "Send email success" };
     }

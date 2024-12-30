@@ -68,7 +68,7 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
                 data: {
                     userId: newUser.id,
                     couponCode: newCouponcode,
-                    value: 10,
+                    value: 10000,
                     isUsed: false,
                     createdAt: new Date(),
                     expiredAt: (0, date_fns_1.addDays)(new Date(), 90),
