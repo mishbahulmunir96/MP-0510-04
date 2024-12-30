@@ -4,9 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -141,10 +141,10 @@ model Transaction {
   couponId     Int?
   user         User     @relation(fields: [userId], references: [id])
   voucher      Voucher? @relation(fields: [voucherId], references: [id])
-  amount       Int 
-  ticketCount  Int 
-  pointUse     Int? 
-  paymentProof String? 
+  amount       Int
+  ticketCount  Int
+  pointUse     Int?
+  paymentProof String?
   status       Status?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -160,5 +160,5 @@ enum Status {
   done
   rejected
   expired
-  cancelled
+  cancelled
 }
