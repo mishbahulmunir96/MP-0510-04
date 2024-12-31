@@ -11,18 +11,23 @@ import { validateCreateTransaction } from "../validators/transaction.validator";
 
 const router = express.Router();
 
-router.get("/:id", getTransactionController);
+// Mendapatkan transaksi berdasarkan ID
+router.get("/:id", verifyToken, getTransactionController);
+
+// Membuat transaksi baru
 router.post(
   "/",
   verifyToken,
-  validateCreateTransaction,
+  validateCreateTransaction, // Validasi input untuk membuat transaksi
   createTransactionController
 );
+
+// Mengunggah bukti pembayaran untuk transaksi tertentu
 router.patch(
   "/:id",
   verifyToken,
-  uploader().single("paymentProof"),
-  fileFilter,
+  uploader().single("paymentProof"), // Menggunakan multer untuk mengunggah file
+  fileFilter, // Memfilter file yang diunggah
   uploadPaymentProofController
 );
 
