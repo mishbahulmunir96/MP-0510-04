@@ -4,12 +4,13 @@ import { gettransactionService } from "../services/transaction/get-transaction.s
 import { uploadPaymentProofService } from "../services/transaction/upload-payment-proof.service";
 import { getTransactionsByOrganizerService } from "../services/transaction/get-transactions-by-organizer.service";
 import { updateTransactionStatusService } from "../services/transaction/update-transaction-status.service";
+import { Status } from "../../prisma/generated/client";
 
 export const createTransactionController = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const userId = res.locals.user.id;
 
@@ -20,7 +21,8 @@ export const createTransactionController = async (
       voucherId: req.body.voucherId,
       couponId: req.body.couponId,
       pointsToUse: req.body.pointsToUse,
-      status: req.body.status,
+      status: Status.waitingPayment,
+      
     };
 
     const result = await createTransactionService(transactionData);
@@ -35,7 +37,7 @@ export const getTransactionController = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const id = Number(req.params.id);
     const result = await gettransactionService(id);
@@ -65,7 +67,7 @@ export const uploadPaymentProofController = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const proofFile = req.file as Express.Multer.File;
     const transactionId = Number(req.params.id);

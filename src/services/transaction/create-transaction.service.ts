@@ -1,5 +1,6 @@
-import { Transaction } from "../../../prisma/generated/client";
+import { Status, Transaction } from "../../../prisma/generated/client";
 import prisma from "../../lib/prisma";
+import schedule from 'node-schedule';
 
 interface CreateTransactionBody {
   userId: number;
@@ -48,7 +49,6 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         throw new Error("Voucher kadaluwarsa");
       }
 
-      // Pastikan voucher terkait dengan event yang sama
       if (voucher.eventId !== body.eventId) {
         throw new Error("Voucher tidak berlaku untuk event ini.");
       }
@@ -60,24 +60,21 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
     if (body.couponId) {
       const coupon = await prisma.coupon.findUnique({
         where: { id: body.couponId },
-        select: { userId: true, isUsed: true, value: true, expiredAt: true }, // Mengambil nilai kupon
+        select: { userId: true, isUsed: true, value: true, expiredAt: true },
       });
 
-      // Periksa apakah kupon ada dan belum digunakan
       if (!coupon || coupon.isUsed) {
         throw new Error("Kupon tidak valid atau sudah digunakan.");
       }
 
-      // Periksa masa berlaku kupon
       if (coupon.expiredAt < new Date()) {
         throw new Error("Kupon telah kedaluwarsa.");
       }
-      // Pastikan kupon milik user yang tepat
+
       if (coupon.userId !== body.userId) {
         throw new Error("Kupon ini bukan milik Anda.");
       }
 
-      // Tambahkan diskon dari kupon jika ada
       totalDiscount += coupon.value; // Tambahkan nilai kupon ke total diskon
     }
 
@@ -92,10 +89,7 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         throw new Error("Poin tidak cukup.");
       }
 
-      if (
-        user.pointExpiredDate === null ||
-        user.pointExpiredDate < new Date()
-      ) {
+      if (user.pointExpiredDate === null || user.pointExpiredDate < new Date()) {
         throw new Error("Poin telah kadaluwarsa.");
       }
 
@@ -115,6 +109,7 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         amount: finalAmount,
         ticketCount: body.ticketCount,
         status: body.status,
+        createdAt: new Date(), 
       },
     });
 
@@ -160,9 +155,23 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
       where: { id: body.eventId },
       data: {
         availableSeat: {
-          decrement: body.ticketCount, // Mengurangi jumlah kursi yang tersedia
+          decrement: body.ticketCount,
         },
       },
+    });
+
+    // Menjadwalkan pembatalan transaksi jika bukti pembayaran tidak diunggah dalam 2 jam
+    schedule.scheduleJob(Date.now() + 2 * 60 * 60 * 1000, async () => {
+      const transactionToCheck = await prisma.transaction.findUnique({
+        where: { id: transaction.id },
+      });
+
+      if (transactionToCheck && transactionToCheck.status === 'waitingPayment') {
+        await prisma.transaction.update({
+          where: { id: transaction.id },
+          data: { status: 'cancelled' },
+        });
+      }
     });
 
     return transaction;
