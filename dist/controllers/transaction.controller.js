@@ -9,17 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadPaymentProofController = exports.getTransactionController = exports.createTransactionController = void 0;
+exports.updateTransactionStatusController = exports.uploadPaymentProofController = exports.getTransactionsByOrganizerController = exports.getTransactionController = exports.createTransactionController = void 0;
 const create_transaction_service_1 = require("../services/transaction/create-transaction.service");
 const get_transaction_service_1 = require("../services/transaction/get-transaction.service");
 const upload_payment_proof_service_1 = require("../services/transaction/upload-payment-proof.service");
+const get_transactions_by_organizer_service_1 = require("../services/transaction/get-transactions-by-organizer.service");
+const update_transaction_status_service_1 = require("../services/transaction/update-transaction-status.service");
 const createTransactionController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Ambil userId dari req.user yang sudah diverifikasi
-        const userId = res.locals.user.id; // Asumsi req.user memiliki properti id
-        // Membangun data transaksi menggunakan input dari body permintaan
+        const userId = res.locals.user.id;
         const transactionData = {
-            userId, // Menggunakan userId dari req.user
+            userId,
             eventId: req.body.eventId,
             ticketCount: req.body.ticketCount,
             voucherId: req.body.voucherId,
@@ -28,7 +28,7 @@ const createTransactionController = (req, res, next) => __awaiter(void 0, void 0
             status: req.body.status,
         };
         const result = yield (0, create_transaction_service_1.createTransactionService)(transactionData);
-        res.status(201).send(result); // Status 201 (Created)
+        res.status(201).send(result);
     }
     catch (error) {
         next(error);
@@ -46,12 +46,23 @@ const getTransactionController = (req, res, next) => __awaiter(void 0, void 0, v
     }
 });
 exports.getTransactionController = getTransactionController;
+const getTransactionsByOrganizerController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.user.id;
+        const result = yield (0, get_transactions_by_organizer_service_1.getTransactionsByOrganizerService)(userId);
+        res.status(200).send(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getTransactionsByOrganizerController = getTransactionsByOrganizerController;
 const uploadPaymentProofController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const proofFile = req.file; // Mendapatkan file bukti pembayaran dari request
-        const transactionId = Number(req.params.id); // Mengambil ID transaksi dari parameter URL
+        const proofFile = req.file;
+        const transactionId = Number(req.params.id);
         if (!proofFile) {
-            res.status(400).send("Payment proof is required."); // Validasi jika tidak ada file yang diupload
+            res.status(400).send("Payment proof is required.");
             return;
         }
         const updatedTransaction = yield (0, upload_payment_proof_service_1.uploadPaymentProofService)({
@@ -61,7 +72,22 @@ const uploadPaymentProofController = (req, res, next) => __awaiter(void 0, void 
         res.status(200).json(updatedTransaction);
     }
     catch (error) {
-        next(error); // Menyerahkan error ke middleware pengelola error
+        next(error);
     }
 });
 exports.uploadPaymentProofController = uploadPaymentProofController;
+const updateTransactionStatusController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const transactionId = Number(req.params.id);
+        const { status, notes } = req.body;
+        if (!status) {
+            throw new Error("Status is required");
+        }
+        const updatedTransaction = yield (0, update_transaction_status_service_1.updateTransactionStatusService)(transactionId, status);
+        res.status(200).json(updatedTransaction);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.updateTransactionStatusController = updateTransactionStatusController;
