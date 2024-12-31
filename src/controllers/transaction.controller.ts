@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { createTransactionService } from "../services/transaction/create-transaction.service";
 import { gettransactionService } from "../services/transaction/get-transaction.service";
 import { uploadPaymentProofService } from "../services/transaction/upload-payment-proof.service";
+import { getTransactionsByOrganizerService } from "../services/transaction/get-transactions-by-organizer.service";
+import { updateTransactionStatusService } from "../services/transaction/update-transaction-status.service";
 import { Status } from "../../prisma/generated/client";
 
 export const createTransactionController = async (
@@ -45,6 +47,22 @@ export const getTransactionController = async (
   }
 };
 
+export const getTransactionsByOrganizerController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = res.locals.user.id;
+
+    const result = await getTransactionsByOrganizerService(userId);
+
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const uploadPaymentProofController = async (
   req: Request,
   res: Response,
@@ -63,6 +81,30 @@ export const uploadPaymentProofController = async (
       transactionId,
       paymentProof: proofFile,
     });
+
+    res.status(200).json(updatedTransaction);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateTransactionStatusController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const transactionId = Number(req.params.id);
+
+    const { status, notes } = req.body;
+    if (!status) {
+      throw new Error("Status is required");
+    }
+
+    const updatedTransaction = await updateTransactionStatusService(
+      transactionId,
+      status
+    );
 
     res.status(200).json(updatedTransaction);
   } catch (error) {
