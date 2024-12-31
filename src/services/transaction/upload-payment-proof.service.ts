@@ -11,6 +11,19 @@ export const uploadPaymentProofService = async ({
   paymentProof,
 }: UploadPaymentProofBody) => {
   try {
+    // Periksa apakah transaksi ada dan dalam status yang valid
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+    });
+
+    if (!transaction) {
+      throw new Error("Transaction not found.");
+    }
+
+    if (transaction.status === "cancelled") {
+      throw new Error("Transaction has been cancelled. Cannot upload proof.");
+    }
+
     // Mengupload file ke Cloudinary
     const { secure_url } = await cloudinaryUpload(paymentProof);
 
@@ -19,7 +32,7 @@ export const uploadPaymentProofService = async ({
       where: { id: transactionId },
       data: {
         paymentProof: secure_url, // Menyimpan URL bukti pembayaran
-        status: "waitingConfirmation",
+        status: "waitingConfirmation", // Mengubah status menjadi 'waitingConfirmation'
       },
     });
 
