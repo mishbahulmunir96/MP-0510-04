@@ -34,19 +34,20 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
             const referringUser = yield prisma_1.default.user.findFirst({
                 where: { referralCode },
             });
-            if (referringUser) {
-                referredBy = referringUser === null || referringUser === void 0 ? void 0 : referringUser.id;
-                // point
-                yield prisma_1.default.user.update({
-                    where: { id: referredBy },
-                    data: {
-                        point: {
-                            increment: 10000,
-                        },
-                        pointExpiredDate: (0, date_fns_1.addDays)(new Date(), 90),
-                    },
-                });
+            if (!referringUser) {
+                throw new Error("Invalid referral code");
             }
+            referredBy = referringUser === null || referringUser === void 0 ? void 0 : referringUser.id;
+            // point
+            yield prisma_1.default.user.update({
+                where: { id: referredBy },
+                data: {
+                    point: {
+                        increment: 10000,
+                    },
+                    pointExpiredDate: (0, date_fns_1.addDays)(new Date(), 90),
+                },
+            });
         }
         const newUser = yield prisma_1.default.user.create({
             data: {

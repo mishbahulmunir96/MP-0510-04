@@ -34,20 +34,22 @@ export const registerService = async (body: User) => {
       const referringUser = await prisma.user.findFirst({
         where: { referralCode },
       });
-      if (referringUser) {
-        referredBy = referringUser?.id;
 
-        // point
-        await prisma.user.update({
-          where: { id: referredBy },
-          data: {
-            point: {
-              increment: 10000,
-            },
-            pointExpiredDate: addDays(new Date(), 90),
-          },
-        });
+      if (!referringUser) {
+        throw new Error("Invalid referral code");
       }
+
+      referredBy = referringUser?.id;
+      // point
+      await prisma.user.update({
+        where: { id: referredBy },
+        data: {
+          point: {
+            increment: 10000,
+          },
+          pointExpiredDate: addDays(new Date(), 90),
+        },
+      });
     }
 
     const newUser = await prisma.user.create({

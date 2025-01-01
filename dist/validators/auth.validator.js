@@ -16,9 +16,8 @@ exports.validateRegister = [
         .isEmail()
         .withMessage("Invalid email format"),
     (0, express_validator_1.body)("phoneNumber")
+        .optional({ nullable: true, checkFalsy: true })
         .trim()
-        .notEmpty()
-        .withMessage("Phone Number is required")
         .isMobilePhone("id-ID")
         .withMessage("Invalid phone number format"),
     (0, express_validator_1.body)("password")
