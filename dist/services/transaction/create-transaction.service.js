@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTransactionService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
+const node_schedule_1 = __importDefault(require("node-schedule"));
 const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const event = yield prisma_1.default.event.findUnique({
@@ -44,7 +45,6 @@ const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, fun
             if (voucher.expDate < new Date()) {
                 throw new Error("Voucher kadaluwarsa");
             }
-            // Pastikan voucher terkait dengan event yang sama
             if (voucher.eventId !== body.eventId) {
                 throw new Error("Voucher tidak berlaku untuk event ini.");
             }
@@ -54,21 +54,17 @@ const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, fun
         if (body.couponId) {
             const coupon = yield prisma_1.default.coupon.findUnique({
                 where: { id: body.couponId },
-                select: { userId: true, isUsed: true, value: true, expiredAt: true }, // Mengambil nilai kupon
+                select: { userId: true, isUsed: true, value: true, expiredAt: true },
             });
-            // Periksa apakah kupon ada dan belum digunakan
             if (!coupon || coupon.isUsed) {
                 throw new Error("Kupon tidak valid atau sudah digunakan.");
             }
-            // Periksa masa berlaku kupon
             if (coupon.expiredAt < new Date()) {
                 throw new Error("Kupon telah kedaluwarsa.");
             }
-            // Pastikan kupon milik user yang tepat
             if (coupon.userId !== body.userId) {
                 throw new Error("Kupon ini bukan milik Anda.");
             }
-            // Tambahkan diskon dari kupon jika ada
             totalDiscount += coupon.value; // Tambahkan nilai kupon ke total diskon
         }
         // Validasi Poin jika ada
@@ -80,8 +76,7 @@ const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, fun
             if (!user || user.point < body.pointsToUse) {
                 throw new Error("Poin tidak cukup.");
             }
-            if (user.pointExpiredDate === null ||
-                user.pointExpiredDate < new Date()) {
+            if (user.pointExpiredDate === null || user.pointExpiredDate < new Date()) {
                 throw new Error("Poin telah kadaluwarsa.");
             }
             totalDiscount += body.pointsToUse; // Tambahkan poin yang digunakan ke total diskon
@@ -97,6 +92,7 @@ const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, fun
                 amount: finalAmount,
                 ticketCount: body.ticketCount,
                 status: body.status,
+                createdAt: new Date(),
             },
         });
         // Update voucher jika digunakan
@@ -138,10 +134,22 @@ const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, fun
             where: { id: body.eventId },
             data: {
                 availableSeat: {
-                    decrement: body.ticketCount, // Mengurangi jumlah kursi yang tersedia
+                    decrement: body.ticketCount,
                 },
             },
         });
+        // Menjadwalkan pembatalan transaksi jika bukti pembayaran tidak diunggah dalam 2 jam
+        node_schedule_1.default.scheduleJob(Date.now() + 2 * 60 * 60 * 1000, () => __awaiter(void 0, void 0, void 0, function* () {
+            const transactionToCheck = yield prisma_1.default.transaction.findUnique({
+                where: { id: transaction.id },
+            });
+            if (transactionToCheck && transactionToCheck.status === 'waitingPayment') {
+                yield prisma_1.default.transaction.update({
+                    where: { id: transaction.id },
+                    data: { status: 'cancelled' },
+                });
+            }
+        }));
         return transaction;
     }
     catch (error) {

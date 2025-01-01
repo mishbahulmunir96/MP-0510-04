@@ -33,6 +33,16 @@ const loginService = (body) => __awaiter(void 0, void 0, void 0, function* () {
         const { email, password } = body;
         const user = yield prisma_1.default.user.findFirst({
             where: { email },
+            include: {
+                referrals: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        createdAt: true,
+                    },
+                },
+            },
         });
         if (!user) {
             throw new Error("Invalid email address");

@@ -15,6 +15,7 @@ const get_transaction_service_1 = require("../services/transaction/get-transacti
 const upload_payment_proof_service_1 = require("../services/transaction/upload-payment-proof.service");
 const get_transactions_by_organizer_service_1 = require("../services/transaction/get-transactions-by-organizer.service");
 const update_transaction_status_service_1 = require("../services/transaction/update-transaction-status.service");
+const client_1 = require("../../prisma/generated/client");
 const createTransactionController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.user.id;
@@ -25,7 +26,7 @@ const createTransactionController = (req, res, next) => __awaiter(void 0, void 0
             voucherId: req.body.voucherId,
             couponId: req.body.couponId,
             pointsToUse: req.body.pointsToUse,
-            status: req.body.status,
+            status: client_1.Status.waitingPayment,
         };
         const result = yield (0, create_transaction_service_1.createTransactionService)(transactionData);
         res.status(201).send(result);

@@ -17,9 +17,8 @@ export const validateRegister = [
     .withMessage("Invalid email format"),
 
   body("phoneNumber")
+    .optional({ nullable: true, checkFalsy: true })
     .trim()
-    .notEmpty()
-    .withMessage("Phone Number is required")
     .isMobilePhone("id-ID")
     .withMessage("Invalid phone number format"),
 

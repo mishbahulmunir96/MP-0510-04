@@ -12,6 +12,16 @@ export const loginService = async (body: Body) => {
 
     const user = await prisma.user.findFirst({
       where: { email },
+      include: {
+        referrals: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            createdAt: true,
+          },
+        },
+      },
     });
 
     if (!user) {

@@ -6043,6 +6043,8 @@ export namespace Prisma {
     userId: number | null
     price: number | null
     availableSeat: number | null
+    ticketsSold: number | null
+    attendance: number | null
   }
 
   export type EventSumAggregateOutputType = {
@@ -6050,6 +6052,8 @@ export namespace Prisma {
     userId: number | null
     price: number | null
     availableSeat: number | null
+    ticketsSold: number | null
+    attendance: number | null
   }
 
   export type EventMinAggregateOutputType = {
@@ -6066,6 +6070,8 @@ export namespace Prisma {
     endTime: Date | null
     deletedAt: Date | null
     createdAt: Date | null
+    ticketsSold: number | null
+    attendance: number | null
   }
 
   export type EventMaxAggregateOutputType = {
@@ -6082,6 +6088,8 @@ export namespace Prisma {
     endTime: Date | null
     deletedAt: Date | null
     createdAt: Date | null
+    ticketsSold: number | null
+    attendance: number | null
   }
 
   export type EventCountAggregateOutputType = {
@@ -6098,6 +6106,8 @@ export namespace Prisma {
     endTime: number
     deletedAt: number
     createdAt: number
+    ticketsSold: number
+    attendance: number
     _all: number
   }
 
@@ -6107,6 +6117,8 @@ export namespace Prisma {
     userId?: true
     price?: true
     availableSeat?: true
+    ticketsSold?: true
+    attendance?: true
   }
 
   export type EventSumAggregateInputType = {
@@ -6114,6 +6126,8 @@ export namespace Prisma {
     userId?: true
     price?: true
     availableSeat?: true
+    ticketsSold?: true
+    attendance?: true
   }
 
   export type EventMinAggregateInputType = {
@@ -6130,6 +6144,8 @@ export namespace Prisma {
     endTime?: true
     deletedAt?: true
     createdAt?: true
+    ticketsSold?: true
+    attendance?: true
   }
 
   export type EventMaxAggregateInputType = {
@@ -6146,6 +6162,8 @@ export namespace Prisma {
     endTime?: true
     deletedAt?: true
     createdAt?: true
+    ticketsSold?: true
+    attendance?: true
   }
 
   export type EventCountAggregateInputType = {
@@ -6162,6 +6180,8 @@ export namespace Prisma {
     endTime?: true
     deletedAt?: true
     createdAt?: true
+    ticketsSold?: true
+    attendance?: true
     _all?: true
   }
 
@@ -6265,6 +6285,8 @@ export namespace Prisma {
     endTime: Date
     deletedAt: Date | null
     createdAt: Date
+    ticketsSold: number
+    attendance: number
     _count: EventCountAggregateOutputType | null
     _avg: EventAvgAggregateOutputType | null
     _sum: EventSumAggregateOutputType | null
@@ -6300,6 +6322,8 @@ export namespace Prisma {
     endTime?: boolean
     deletedAt?: boolean
     createdAt?: boolean
+    ticketsSold?: boolean
+    attendance?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     voucher?: boolean | Event$voucherArgs<ExtArgs>
     transaction?: boolean | Event$transactionArgs<ExtArgs>
@@ -6320,6 +6344,8 @@ export namespace Prisma {
     endTime?: boolean
     deletedAt?: boolean
     createdAt?: boolean
+    ticketsSold?: boolean
+    attendance?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["event"]>
 
@@ -6337,6 +6363,8 @@ export namespace Prisma {
     endTime?: boolean
     deletedAt?: boolean
     createdAt?: boolean
+    ticketsSold?: boolean
+    attendance?: boolean
   }
 
   export type EventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6370,6 +6398,8 @@ export namespace Prisma {
       endTime: Date
       deletedAt: Date | null
       createdAt: Date
+      ticketsSold: number
+      attendance: number
     }, ExtArgs["result"]["event"]>
     composites: {}
   }
@@ -6779,6 +6809,8 @@ export namespace Prisma {
     readonly endTime: FieldRef<"Event", 'DateTime'>
     readonly deletedAt: FieldRef<"Event", 'DateTime'>
     readonly createdAt: FieldRef<"Event", 'DateTime'>
+    readonly ticketsSold: FieldRef<"Event", 'Int'>
+    readonly attendance: FieldRef<"Event", 'Int'>
   }
     
 
@@ -9371,7 +9403,9 @@ export namespace Prisma {
     startTime: 'startTime',
     endTime: 'endTime',
     deletedAt: 'deletedAt',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    ticketsSold: 'ticketsSold',
+    attendance: 'attendance'
   };
 
   export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
@@ -9921,6 +9955,8 @@ export namespace Prisma {
     endTime?: DateTimeFilter<"Event"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Event"> | Date | string | null
     createdAt?: DateTimeFilter<"Event"> | Date | string
+    ticketsSold?: IntFilter<"Event"> | number
+    attendance?: IntFilter<"Event"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     voucher?: VoucherListRelationFilter
     transaction?: TransactionListRelationFilter
@@ -9940,6 +9976,8 @@ export namespace Prisma {
     endTime?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    ticketsSold?: SortOrder
+    attendance?: SortOrder
     user?: UserOrderByWithRelationInput
     voucher?: VoucherOrderByRelationAggregateInput
     transaction?: TransactionOrderByRelationAggregateInput
@@ -9962,6 +10000,8 @@ export namespace Prisma {
     endTime?: DateTimeFilter<"Event"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Event"> | Date | string | null
     createdAt?: DateTimeFilter<"Event"> | Date | string
+    ticketsSold?: IntFilter<"Event"> | number
+    attendance?: IntFilter<"Event"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     voucher?: VoucherListRelationFilter
     transaction?: TransactionListRelationFilter
@@ -9981,6 +10021,8 @@ export namespace Prisma {
     endTime?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    ticketsSold?: SortOrder
+    attendance?: SortOrder
     _count?: EventCountOrderByAggregateInput
     _avg?: EventAvgOrderByAggregateInput
     _max?: EventMaxOrderByAggregateInput
@@ -10005,6 +10047,8 @@ export namespace Prisma {
     endTime?: DateTimeWithAggregatesFilter<"Event"> | Date | string
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Event"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Event"> | Date | string
+    ticketsSold?: IntWithAggregatesFilter<"Event"> | number
+    attendance?: IntWithAggregatesFilter<"Event"> | number
   }
 
   export type ReviewWhereInput = {
@@ -10566,6 +10610,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     user: UserCreateNestedOneWithoutEventInput
     voucher?: VoucherCreateNestedManyWithoutEventInput
     transaction?: TransactionCreateNestedManyWithoutEventInput
@@ -10585,6 +10631,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     voucher?: VoucherUncheckedCreateNestedManyWithoutEventInput
     transaction?: TransactionUncheckedCreateNestedManyWithoutEventInput
   }
@@ -10601,6 +10649,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     user?: UserUpdateOneRequiredWithoutEventNestedInput
     voucher?: VoucherUpdateManyWithoutEventNestedInput
     transaction?: TransactionUpdateManyWithoutEventNestedInput
@@ -10620,6 +10670,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     voucher?: VoucherUncheckedUpdateManyWithoutEventNestedInput
     transaction?: TransactionUncheckedUpdateManyWithoutEventNestedInput
   }
@@ -10638,6 +10690,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
   }
 
   export type EventUpdateManyMutationInput = {
@@ -10652,6 +10706,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
   }
 
   export type EventUncheckedUpdateManyInput = {
@@ -10668,6 +10724,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReviewCreateInput = {
@@ -11362,6 +11420,8 @@ export namespace Prisma {
     endTime?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
+    ticketsSold?: SortOrder
+    attendance?: SortOrder
   }
 
   export type EventAvgOrderByAggregateInput = {
@@ -11369,6 +11429,8 @@ export namespace Prisma {
     userId?: SortOrder
     price?: SortOrder
     availableSeat?: SortOrder
+    ticketsSold?: SortOrder
+    attendance?: SortOrder
   }
 
   export type EventMaxOrderByAggregateInput = {
@@ -11385,6 +11447,8 @@ export namespace Prisma {
     endTime?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
+    ticketsSold?: SortOrder
+    attendance?: SortOrder
   }
 
   export type EventMinOrderByAggregateInput = {
@@ -11401,6 +11465,8 @@ export namespace Prisma {
     endTime?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
+    ticketsSold?: SortOrder
+    attendance?: SortOrder
   }
 
   export type EventSumOrderByAggregateInput = {
@@ -11408,6 +11474,8 @@ export namespace Prisma {
     userId?: SortOrder
     price?: SortOrder
     availableSeat?: SortOrder
+    ticketsSold?: SortOrder
+    attendance?: SortOrder
   }
 
   export type ReviewCountOrderByAggregateInput = {
@@ -12625,6 +12693,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     voucher?: VoucherCreateNestedManyWithoutEventInput
     transaction?: TransactionCreateNestedManyWithoutEventInput
   }
@@ -12642,6 +12712,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     voucher?: VoucherUncheckedCreateNestedManyWithoutEventInput
     transaction?: TransactionUncheckedCreateNestedManyWithoutEventInput
   }
@@ -13000,6 +13072,8 @@ export namespace Prisma {
     endTime?: DateTimeFilter<"Event"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Event"> | Date | string | null
     createdAt?: DateTimeFilter<"Event"> | Date | string
+    ticketsSold?: IntFilter<"Event"> | number
+    attendance?: IntFilter<"Event"> | number
   }
 
   export type ReviewUpsertWithWhereUniqueWithoutUserInput = {
@@ -13624,6 +13698,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     user: UserCreateNestedOneWithoutEventInput
     transaction?: TransactionCreateNestedManyWithoutEventInput
   }
@@ -13642,6 +13718,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     transaction?: TransactionUncheckedCreateNestedManyWithoutEventInput
   }
 
@@ -13842,6 +13920,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     user?: UserUpdateOneRequiredWithoutEventNestedInput
     transaction?: TransactionUpdateManyWithoutEventNestedInput
   }
@@ -13860,6 +13940,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     transaction?: TransactionUncheckedUpdateManyWithoutEventNestedInput
   }
 
@@ -14337,6 +14419,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     user: UserCreateNestedOneWithoutEventInput
     voucher?: VoucherCreateNestedManyWithoutEventInput
   }
@@ -14355,6 +14439,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
     voucher?: VoucherUncheckedCreateNestedManyWithoutEventInput
   }
 
@@ -14512,6 +14598,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     user?: UserUpdateOneRequiredWithoutEventNestedInput
     voucher?: VoucherUpdateManyWithoutEventNestedInput
   }
@@ -14530,6 +14618,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     voucher?: VoucherUncheckedUpdateManyWithoutEventNestedInput
   }
 
@@ -14603,6 +14693,8 @@ export namespace Prisma {
     endTime: Date | string
     deletedAt?: Date | string | null
     createdAt?: Date | string
+    ticketsSold?: number
+    attendance?: number
   }
 
   export type ReviewCreateManyUserInput = {
@@ -14754,6 +14846,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     voucher?: VoucherUpdateManyWithoutEventNestedInput
     transaction?: TransactionUpdateManyWithoutEventNestedInput
   }
@@ -14771,6 +14865,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
     voucher?: VoucherUncheckedUpdateManyWithoutEventNestedInput
     transaction?: TransactionUncheckedUpdateManyWithoutEventNestedInput
   }
@@ -14788,6 +14884,8 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticketsSold?: IntFieldUpdateOperationsInput | number
+    attendance?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReviewUpdateWithoutUserInput = {

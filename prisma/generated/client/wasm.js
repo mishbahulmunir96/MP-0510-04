@@ -181,7 +181,9 @@ exports.Prisma.EventScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   deletedAt: 'deletedAt',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  ticketsSold: 'ticketsSold',
+  attendance: 'attendance'
 };
 
 exports.Prisma.ReviewScalarFieldEnum = {
