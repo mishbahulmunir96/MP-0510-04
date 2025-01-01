@@ -10,6 +10,7 @@ interface CreateTransactionBody {
   couponId?: number | null; // Opsional
   pointsToUse?: number; // Opsional
   status: Transaction["status"];
+  paymentProofUploaded?: boolean; // Menunjukkan apakah bukti pembayaran diunggah
 }
 
 export const createTransactionService = async (body: CreateTransactionBody) => {
@@ -108,10 +109,18 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         eventId: body.eventId,
         amount: finalAmount,
         ticketCount: body.ticketCount,
-        status: body.status,
+        status: body.status, // Status awal
         createdAt: new Date(), 
       },
     });
+
+    // Jika bukti pembayaran diunggah, update status transaksi
+    if (body.paymentProofUploaded) {
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: { status: 'waitingConfirmation' }, // Ubah status menjadi waitingConfirmation
+      });
+    }
 
     // Update voucher jika digunakan
     if (body.voucherId) {
