@@ -91,10 +91,17 @@ const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, fun
                 eventId: body.eventId,
                 amount: finalAmount,
                 ticketCount: body.ticketCount,
-                status: body.status,
+                status: body.status, // Status awal
                 createdAt: new Date(),
             },
         });
+        // Jika bukti pembayaran diunggah, update status transaksi
+        if (body.paymentProofUploaded) {
+            yield prisma_1.default.transaction.update({
+                where: { id: transaction.id },
+                data: { status: 'waitingConfirmation' }, // Ubah status menjadi waitingConfirmation
+            });
+        }
         // Update voucher jika digunakan
         if (body.voucherId) {
             yield prisma_1.default.voucher.update({
