@@ -6,6 +6,7 @@ import eventRouter from "./routes/event.router";
 import userRouter from "./routes/user.router";
 import voucherRouter from "./routes/voucher.router";
 import transactionRouter from "./routes/transaction.router";
+import statisticRouter from "./routes/statistic.router";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use("/users", userRouter);
 app.use("/events", eventRouter);
 app.use("/vouchers", voucherRouter);
 app.use("/transactions", transactionRouter);
+app.use("/statistics", statisticRouter);
 
 // middleware error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
