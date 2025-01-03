@@ -16,16 +16,25 @@ exports.getEventsService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
 const getEventsService = (query) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { page, sortBy, sortOrder, take, search } = query;
+        const { page = 1, sortBy, sortOrder = 'asc', take = 10, search, category, address } = query;
         const whereClause = { deletedAt: null };
+        // Add search condition
         if (search) {
             whereClause.OR = [{ title: { contains: search, mode: "insensitive" } }];
+        }
+        // Add category filter
+        if (category) {
+            whereClause.category = category;
+        }
+        // Add address filter with partial match
+        if (address) {
+            whereClause.address = { contains: address, mode: "insensitive" };
         }
         const events = yield prisma_1.default.event.findMany({
             where: whereClause,
             skip: (page - 1) * take,
             take: take,
-            orderBy: { [sortBy]: sortOrder },
+            orderBy: sortBy ? { [sortBy]: sortOrder } : undefined, // Sort only if sortBy is provided
         });
         const count = yield prisma_1.default.event.count({ where: whereClause });
         return {
@@ -34,7 +43,8 @@ const getEventsService = (query) => __awaiter(void 0, void 0, void 0, function* 
         };
     }
     catch (error) {
-        throw error;
+        console.error("Error fetching events:", error);
+        throw new Error("Failed to fetch events.");
     }
 });
 exports.getEventsService = getEventsService;
