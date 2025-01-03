@@ -1,6 +1,6 @@
 import { Status, Transaction } from "../../../prisma/generated/client";
 import prisma from "../../lib/prisma";
-import schedule from 'node-schedule';
+import schedule from "node-schedule";
 
 interface CreateTransactionBody {
   userId: number;
@@ -57,7 +57,6 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
       totalDiscount += voucher.value; // Tambahkan diskon dari voucher
     }
 
-    // Validasi Kupon jika ada
     if (body.couponId) {
       const coupon = await prisma.coupon.findUnique({
         where: { id: body.couponId },
@@ -109,8 +108,8 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         eventId: body.eventId,
         amount: finalAmount,
         ticketCount: body.ticketCount,
-        status: body.status, // Status awal
-        createdAt: new Date(), 
+        status: body.paymentProofUploaded ? "waitingConfirmation" : "waitingPayment", // Atur status awal
+        createdAt: new Date(),
       },
     });
 
@@ -118,7 +117,7 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
     if (body.paymentProofUploaded) {
       await prisma.transaction.update({
         where: { id: transaction.id },
-        data: { status: 'waitingConfirmation' }, // Ubah status menjadi waitingConfirmation
+        data: { status: "waitingConfirmation" }, // Ubah status menjadi waitingConfirmation
       });
     }
 
@@ -169,17 +168,135 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
       },
     });
 
-    // Menjadwalkan pembatalan transaksi jika bukti pembayaran tidak diunggah dalam 2 jam
-    schedule.scheduleJob(Date.now() + 2 * 60 * 60 * 1000, async () => {
-      const transactionToCheck = await prisma.transaction.findUnique({
-        where: { id: transaction.id },
-      });
+    // Jadwal pembatalan setelah 2jam jika status masih "waitingPayment"
+    if (!body.paymentProofUploaded) {
+      schedule.scheduleJob(Date.now() + 2 * 60 * 60 * 1000, async () => {
+        try {
+          const transactionToCheck = await prisma.transaction.findUnique({
+            where: { id: transaction.id },
+          });
 
-      if (transactionToCheck && transactionToCheck.status === 'waitingPayment') {
-        await prisma.transaction.update({
+          if (transactionToCheck && transactionToCheck.status === "waitingPayment") {
+            await prisma.transaction.update({
+              where: { id: transaction.id },
+              data: { status: "cancelled" },
+            });
+
+            // Rollback availableSeat 
+            await prisma.event.update({
+              where: { id: transaction.eventId },
+              data: {
+                availableSeat: {
+                  increment: transaction.ticketCount,
+                },
+              },
+            });
+
+            // Rollback voucher
+            if (body.voucherId) {
+              await prisma.voucher.update({
+                where: { id: body.voucherId },
+                data: {
+                  usedQty: {
+                    decrement: 1,
+                  },
+                  qty: {
+                    increment: 1,
+                  },
+                },
+              });
+            }
+
+            // Rollback poin 
+            if (body.pointsToUse) {
+              await prisma.user.update({
+                where: { id: body.userId },
+                data: {
+                  point: {
+                    increment: body.pointsToUse,
+                  },
+                },
+              });
+            }
+
+            // Rollback kupon
+            if (body.couponId) {
+              await prisma.coupon.update({
+                where: { id: body.couponId },
+                data: {
+                  isUsed: false,
+                },
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Kesalahan saat pembatalan terjadwal:", error);
+        }
+      });
+    }
+
+    // Jadwal pembatalan setelah 3 hari jika status masih "waitingConfirmation"
+    schedule.scheduleJob(Date.now() + 3 * 24 * 60 * 60 * 1000, async () => {
+      try {
+        const transactionToCheck = await prisma.transaction.findUnique({
           where: { id: transaction.id },
-          data: { status: 'cancelled' },
         });
+
+        if (transactionToCheck && transactionToCheck.status === "waitingConfirmation") {
+          await prisma.transaction.update({
+            where: { id: transaction.id },
+            data: { status: "cancelled" },
+          });
+
+          // Rollback availableSeat
+          await prisma.event.update({
+            where: { id: transaction.eventId },
+            data: {
+              availableSeat: {
+                increment: transaction.ticketCount,
+              },
+            },
+          });
+
+          // Rollback voucher jika digunakan
+          if (body.voucherId) {
+            await prisma.voucher.update({
+              where: { id: body.voucherId },
+              data: {
+                usedQty: {
+                  decrement: 1,
+                },
+                qty: {
+                  increment: 1,
+                },
+              },
+            });
+          }
+
+          // Rollback poin jika digunakan
+          if (body.pointsToUse) {
+            await prisma.user.update({
+              where: { id: body.userId },
+              data: {
+                point: {
+                  increment: body.pointsToUse,
+                },
+              },
+            });
+          }
+
+          // Rollback kupon jika digunakan
+          if (body.couponId) {
+            await prisma.coupon.update({
+              where: { id: body.couponId },
+              data: {
+                isUsed: false,
+              },
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Kesalahan saat pembatalan terjadwal:", error);
       }
     });
 
