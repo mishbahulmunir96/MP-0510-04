@@ -18,12 +18,12 @@ import { checkUserRole } from "../lib/checkUserRole";
 const router = Router();
 
 router.get("/", getEventsController);
-router.get("/byuser", verifyToken, getEventsByUserController);
+router.get("/byuser", verifyToken, checkUserRole, getEventsByUserController);
 router.get("/:id", getEventController);
 router.post(
   "/create-event",
   verifyToken,
-  // checkUserRole,
+  checkUserRole,
   uploader().fields([{ name: "thumbnail", maxCount: 1 }]),
   fileFilter,
   validateCreateEvent,
