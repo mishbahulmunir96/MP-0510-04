@@ -89,7 +89,10 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         throw new Error("Poin tidak cukup.");
       }
 
-      if (user.pointExpiredDate === null || user.pointExpiredDate < new Date()) {
+      if (
+        user.pointExpiredDate === null ||
+        user.pointExpiredDate < new Date()
+      ) {
         throw new Error("Poin telah kadaluwarsa.");
       }
 
@@ -108,7 +111,9 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         eventId: body.eventId,
         amount: finalAmount,
         ticketCount: body.ticketCount,
-        status: body.paymentProofUploaded ? "waitingConfirmation" : "waitingPayment", // Atur status awal
+        status: body.paymentProofUploaded
+          ? "waitingConfirmation"
+          : "waitingPayment", // Atur status awal
         createdAt: new Date(),
       },
     });
@@ -176,13 +181,16 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
             where: { id: transaction.id },
           });
 
-          if (transactionToCheck && transactionToCheck.status === "waitingPayment") {
+          if (
+            transactionToCheck &&
+            transactionToCheck.status === "waitingPayment"
+          ) {
             await prisma.transaction.update({
               where: { id: transaction.id },
-              data: { status: "cancelled" },
+              data: { status: "expired" },
             });
 
-            // Rollback availableSeat 
+            // Rollback availableSeat
             await prisma.event.update({
               where: { id: transaction.eventId },
               data: {
@@ -207,7 +215,7 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
               });
             }
 
-            // Rollback poin 
+            // Rollback poin
             if (body.pointsToUse) {
               await prisma.user.update({
                 where: { id: body.userId },
@@ -242,7 +250,10 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
           where: { id: transaction.id },
         });
 
-        if (transactionToCheck && transactionToCheck.status === "waitingConfirmation") {
+        if (
+          transactionToCheck &&
+          transactionToCheck.status === "waitingConfirmation"
+        ) {
           await prisma.transaction.update({
             where: { id: transaction.id },
             data: { status: "cancelled" },

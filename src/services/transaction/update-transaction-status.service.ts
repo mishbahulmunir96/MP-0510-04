@@ -10,6 +10,12 @@ export const updateTransactionStatusService = async (
   try {
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
+      include: {
+        voucher: true,
+        coupon: true,
+        event: true,
+        user: true,
+      },
     });
 
     if (!transaction) {
@@ -32,36 +38,90 @@ export const updateTransactionStatusService = async (
       );
     }
 
-    const updatedTransaction = await prisma.transaction.update({
-      where: { id: transactionId },
-      data: { status: status as Status },
-    });
-
-    // Kirim email jika status berubah menjadi "done" atau "rejected"
-    if (status === "done" || status === "rejected") {
-      const user = await prisma.user.findUnique({
-        where: { id: transaction.userId }, // Ganti dengan field yang sesuai di model Transaction
+    // Gunakan transaksi database untuk memastikan semua operasi berhasil atau gagal bersama-sama
+    const updatedTransaction = await prisma.$transaction(async (prisma) => {
+      const updatedTransaction = await prisma.transaction.update({
+        where: { id: transactionId },
+        data: { status: status as Status },
       });
 
-      if (user && user.email) {
-        const emailHtml = notificationTrxEmail({
-          userName: `${user.firstName} ${user.lastName}`,
-          transactionID: transaction.id.toString(),
-          amount: transaction.amount.toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
-          }),
-          date: new Date(transaction.createdAt).toLocaleDateString("id-ID"),
-          status: status,
-        });
+      if (status === "done" || status === "rejected") {
+        const user = transaction.user;
 
-        transporter.sendMail({
-          to: user.email,
-          subject: "Transaction Status Update",
-          html: emailHtml,
+        if (user && user.email) {
+          const emailHtml = notificationTrxEmail({
+            userName: `${user.firstName} ${user.lastName}`,
+            transactionID: transaction.id.toString(),
+            amount: transaction.amount.toLocaleString("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            }),
+            date: new Date(transaction.createdAt).toLocaleDateString("id-ID"),
+            status: status,
+          });
+
+          transporter
+            .sendMail({
+              to: user.email,
+              subject: "Transaction Status Update",
+              html: emailHtml,
+            })
+            .catch((error) => {
+              console.error("Failed to send email:", error);
+            });
+        }
+      }
+
+      if (status === "rejected") {
+        if (transaction.voucherId) {
+          await prisma.voucher.update({
+            where: { id: transaction.voucherId },
+            data: {
+              usedQty: {
+                decrement: 1, // Mengurangi usedQty
+              },
+              qty: {
+                increment: 1, // Mengembalikan kuota voucher
+              },
+            },
+          });
+        }
+
+        // rollback point
+        if (transaction.pointUse) {
+          await prisma.user.update({
+            where: { id: transaction.userId },
+            data: {
+              point: {
+                increment: transaction.pointUse,
+              },
+            },
+          });
+        }
+
+        // rollback coupon
+        if (transaction.couponId) {
+          await prisma.coupon.update({
+            where: { id: transaction.couponId },
+            data: {
+              isUsed: false,
+            },
+          });
+        }
+
+        // rollback availableseat
+        await prisma.event.update({
+          where: { id: transaction.eventId },
+          data: {
+            availableSeat: {
+              increment: transaction.ticketCount,
+            },
+          },
         });
       }
-    }
+
+      return updatedTransaction;
+    });
 
     return updatedTransaction;
   } catch (error) {

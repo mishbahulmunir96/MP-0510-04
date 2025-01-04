@@ -21,6 +21,12 @@ const updateTransactionStatusService = (transactionId, status) => __awaiter(void
     try {
         const transaction = yield prisma_1.default.transaction.findUnique({
             where: { id: transactionId },
+            include: {
+                voucher: true,
+                coupon: true,
+                event: true,
+                user: true,
+            },
         });
         if (!transaction) {
             throw new Error("Transaction not found");
@@ -36,33 +42,82 @@ const updateTransactionStatusService = (transactionId, status) => __awaiter(void
         if (!validStatuses.includes(status)) {
             throw new Error(`Invalid status: ${status}. Valid statuses are: ${validStatuses.join(", ")}`);
         }
-        const updatedTransaction = yield prisma_1.default.transaction.update({
-            where: { id: transactionId },
-            data: { status: status },
-        });
-        // Kirim email jika status berubah menjadi "done" atau "rejected"
-        if (status === "done" || status === "rejected") {
-            const user = yield prisma_1.default.user.findUnique({
-                where: { id: transaction.userId }, // Ganti dengan field yang sesuai di model Transaction
+        // Gunakan transaksi database untuk memastikan semua operasi berhasil atau gagal bersama-sama
+        const updatedTransaction = yield prisma_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+            const updatedTransaction = yield prisma.transaction.update({
+                where: { id: transactionId },
+                data: { status: status },
             });
-            if (user && user.email) {
-                const emailHtml = (0, notificationTrxEmail_1.notificationTrxEmail)({
-                    userName: `${user.firstName} ${user.lastName}`,
-                    transactionID: transaction.id.toString(),
-                    amount: transaction.amount.toLocaleString("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                    }),
-                    date: new Date(transaction.createdAt).toLocaleDateString("id-ID"),
-                    status: status,
-                });
-                nodemailer_1.transporter.sendMail({
-                    to: user.email,
-                    subject: "Transaction Status Update",
-                    html: emailHtml,
+            if (status === "done" || status === "rejected") {
+                const user = transaction.user;
+                if (user && user.email) {
+                    const emailHtml = (0, notificationTrxEmail_1.notificationTrxEmail)({
+                        userName: `${user.firstName} ${user.lastName}`,
+                        transactionID: transaction.id.toString(),
+                        amount: transaction.amount.toLocaleString("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                        }),
+                        date: new Date(transaction.createdAt).toLocaleDateString("id-ID"),
+                        status: status,
+                    });
+                    nodemailer_1.transporter
+                        .sendMail({
+                        to: user.email,
+                        subject: "Transaction Status Update",
+                        html: emailHtml,
+                    })
+                        .catch((error) => {
+                        console.error("Failed to send email:", error);
+                    });
+                }
+            }
+            if (status === "rejected") {
+                if (transaction.voucherId) {
+                    yield prisma.voucher.update({
+                        where: { id: transaction.voucherId },
+                        data: {
+                            usedQty: {
+                                decrement: 1, // Mengurangi usedQty
+                            },
+                            qty: {
+                                increment: 1, // Mengembalikan kuota voucher
+                            },
+                        },
+                    });
+                }
+                // rollback point
+                if (transaction.pointUse) {
+                    yield prisma.user.update({
+                        where: { id: transaction.userId },
+                        data: {
+                            point: {
+                                increment: transaction.pointUse,
+                            },
+                        },
+                    });
+                }
+                // rollback coupon
+                if (transaction.couponId) {
+                    yield prisma.coupon.update({
+                        where: { id: transaction.couponId },
+                        data: {
+                            isUsed: false,
+                        },
+                    });
+                }
+                // rollback availableseat
+                yield prisma.event.update({
+                    where: { id: transaction.eventId },
+                    data: {
+                        availableSeat: {
+                            increment: transaction.ticketCount,
+                        },
+                    },
                 });
             }
-        }
+            return updatedTransaction;
+        }));
         return updatedTransaction;
     }
     catch (error) {
