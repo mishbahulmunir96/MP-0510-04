@@ -20,9 +20,8 @@ export const createTransactionController = async (
       ticketCount: req.body.ticketCount,
       voucherId: req.body.voucherId,
       couponId: req.body.couponId,
-      pointsToUse: req.body.pointsToUse,
-      status: Status.waitingPayment,
-      
+      pointsToUse: req.body.pointsUse, 
+      paymentProofUploaded: req.body.paymentProofUploaded || false,
     };
 
     const result = await createTransactionService(transactionData);

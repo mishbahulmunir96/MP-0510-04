@@ -26,16 +26,15 @@ router.get("/:id", verifyToken, getTransactionController);
 router.post(
   "/",
   verifyToken,
-  validateCreateTransaction, // Validasi input untuk membuat transaksi
+  validateCreateTransaction, 
   createTransactionController
 );
 
-// Mengunggah bukti pembayaran untuk transaksi tertentu
 router.patch(
   "/:id",
   verifyToken,
-  uploader().single("paymentProof"), // Menggunakan multer untuk mengunggah file
-  fileFilter, // Memfilter file yang diunggah
+  uploader().single("paymentProof"),
+  fileFilter,
   uploadPaymentProofController
 );
 router.patch(
