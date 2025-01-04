@@ -10,31 +10,27 @@ export const validateCreateTransaction = [
     .isInt({ gt: 0 })
     .withMessage("Ticket count must be greater than 0"),
 
-  body("status").notEmpty().withMessage("Status is required"),
-
   body("voucherId").custom((value) => {
-    // Mengizinkan null dan memeriksa untuk angka
-    if (value !== null && !isNaN(Number(value))) {
-      return true; // Jika value adalah angka
+    if (value !== null && !isNaN(Number(value)) && Number(value) > 0) {
+      return true; // Jika value adalah angka positif
     }
     if (value === null) {
       return true; // Jika value adalah null
     }
-    throw new Error("Coupon ID must be a number or null");
+    throw new Error("Voucher ID must be a positive number or null");
   }),
 
   body("couponId").custom((value) => {
-    // Mengizinkan null dan memeriksa untuk angka
-    if (value !== null && !isNaN(Number(value))) {
-      return true; // Jika value adalah angka
+    if (value !== null && !isNaN(Number(value)) && Number(value) > 0) {
+      return true; // Jika value adalah angka positif
     }
     if (value === null) {
       return true; // Jika value adalah null
     }
-    throw new Error("Coupon ID must be a number or null");
+    throw new Error("Coupon ID must be a positive number or null");
   }),
 
-  body("pointsToUse")
+  body("pointsUse")
     .optional()
     .isNumeric()
     .withMessage("Points to use must be a number"),
@@ -43,7 +39,7 @@ export const validateCreateTransaction = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      res.status(400).send({ message: errors.array()[0].msg });
+      res.status(400).send({ message: errors.array() }); // Mengirim semua kesalahan
       return;
     }
 
