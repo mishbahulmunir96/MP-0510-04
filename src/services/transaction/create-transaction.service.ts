@@ -1,6 +1,7 @@
 import schedule from "node-schedule";
 import prisma from "../../lib/prisma";
 
+
 // Interface untuk body transaksi
 interface CreateTransactionBody {
   userId: number;
@@ -331,6 +332,7 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
       const expiryDate = new Date(currentDate.getTime() + 1 * 60 * 1000); // 2 jam
       scheduleTask(`expire-${transaction.id}`, expiryDate, async () => {
         await handleExpiration(transaction.id);
+
       });
     }
 
@@ -338,6 +340,7 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
       const confirmationExpiryDate = new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 hari
       scheduleTask(`cancel-${transaction.id}`, confirmationExpiryDate, async () => {
         await handleCancellation(transaction.id);
+
       });
     }
 

@@ -20,7 +20,8 @@ export const createTransactionController = async (
       ticketCount: req.body.ticketCount,
       voucherId: req.body.voucherId,
       couponId: req.body.couponId,
-      pointsUse: req.body.pointsUse, // Perbaikan di sini
+      pointsUse: req.body.pointsUse, 
+
       paymentProofUploaded: req.body.paymentProofUploaded || false,
     };
 
