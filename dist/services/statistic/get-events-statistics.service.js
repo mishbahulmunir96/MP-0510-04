@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getEventsStatisticsService = void 0;
-// service/get-events-statistics.service.ts
 const prisma_1 = __importDefault(require("../../lib/prisma"));
 const getEventsStatisticsService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ userId, year, month, day, }) {
     try {
