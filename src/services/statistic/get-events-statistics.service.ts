@@ -1,4 +1,3 @@
-// service/get-events-statistics.service.ts
 import prisma from "../../lib/prisma";
 
 interface EventStatisticsParams {

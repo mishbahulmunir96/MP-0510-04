@@ -78,10 +78,10 @@ export const updateTransactionStatusService = async (
             where: { id: transaction.voucherId },
             data: {
               usedQty: {
-                decrement: 1, // Mengurangi usedQty
+                decrement: 1,
               },
               qty: {
-                increment: 1, // Mengembalikan kuota voucher
+                increment: 1,
               },
             },
           });
