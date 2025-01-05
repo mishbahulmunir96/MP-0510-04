@@ -1,32 +1,34 @@
 import schedule from "node-schedule";
 import prisma from "../../lib/prisma";
 
+// Durasi dalam milidetik
+const TWO_HOURS = 2 * 60 * 60 * 1000; 
+const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
 
 // Interface untuk body transaksi
 interface CreateTransactionBody {
   userId: number;
   eventId: number;
   ticketCount: number;
-  voucherId?: number | null; // Opsional
-  couponId?: number | null; // Opsional
-  pointsUse?: number; // Opsional
-  paymentProofUploaded?: boolean; // Menunjukkan apakah bukti pembayaran diunggah
+  voucherId?: number | null;
+  couponId?: number | null;
+  pointsUse?: number;
+  paymentProofUploaded?: boolean;
 }
 
 // Fungsi untuk menjadwalkan tugas
-const scheduleTask = (
-  name: string,
-  date: Date,
-  task: () => Promise<void>
-) => {
-  schedule.scheduleJob(name, date, async () => {
-    try {
-      await task();
-      console.log(`Task ${name} selesai pada ${new Date()}`);
-    } catch (error) {
-      console.error(`Task ${name} gagal:`, error);
-    }
-  });
+const scheduleTask = (name: string, date: Date, task: () => Promise<void>) => {
+  if (date > new Date()) {
+    schedule.scheduleJob(name, date, async () => {
+      try {
+        await task();
+      } catch (error) {
+        console.error(`Error in task ${name}:`, error);
+      }
+    });
+  } else {
+    console.warn(`Skipped scheduling task ${name} due to past date.`);
+  }
 };
 
 // Fungsi untuk membatalkan tugas terjadwal
@@ -34,10 +36,71 @@ const cancelTask = (name: string) => {
   const job = schedule.scheduledJobs[name];
   if (job) {
     job.cancel();
-    console.log(`Task ${name} dibatalkan`);
   } else {
-    console.log(`Task ${name} tidak ditemukan`);
+    console.warn(`Task ${name} not found to cancel.`);
   }
+};
+
+// Fungsi untuk rollback transaksi
+const rollbackTransaction = async (transaction: any) => {
+  if (transaction.voucherId) {
+    await prisma.voucher.update({
+      where: { id: transaction.voucherId },
+      data: { usedQty: { decrement: 1 }, qty: { increment: 1 } },
+    });
+  }
+  if (transaction.pointUse) {
+    await prisma.user.update({
+      where: { id: transaction.userId },
+      data: { point: { increment: transaction.pointUse } },
+    });
+  }
+  if (transaction.couponId) {
+    await prisma.coupon.update({
+      where: { id: transaction.couponId },
+      data: { isUsed: false },
+    });
+  }
+  await prisma.event.update({
+    where: { id: transaction.eventId },
+    data: { availableSeat: { increment: transaction.ticketCount } },
+  });
+};
+
+// Fungsi untuk menangani transaksi kedaluwarsa
+const handleExpiration = async (transactionId: number) => {
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+  });
+
+  if (!transaction || transaction.status !== "waitingPayment") {
+    return;
+  }
+
+  await prisma.transaction.update({
+    where: { id: transactionId },
+    data: { status: "expired" },
+  });
+
+  await rollbackTransaction(transaction);
+};
+
+// Fungsi untuk menangani pembatalan transaksi
+const handleCancellation = async (transactionId: number) => {
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+  });
+
+  if (!transaction || transaction.status !== "waitingConfirmation") {
+    return;
+  }
+
+  await prisma.transaction.update({
+    where: { id: transactionId },
+    data: { status: "cancelled" },
+  });
+
+  await rollbackTransaction(transaction);
 };
 
 // Fungsi untuk memuat ulang jadwal dari database
@@ -48,133 +111,23 @@ const loadJobs = async () => {
     },
   });
 
-  for (const transaction of pendingTransactions) {
-    if (transaction.status === "waitingPayment") {
-      const expirationDate = new Date(
-        transaction.createdAt.getTime() + 1 * 60 * 1000
-      );
-      if (expirationDate > new Date()) {
+  await Promise.all(
+    pendingTransactions.map(async (transaction) => {
+      if (transaction.status === "waitingPayment") {
+        const expirationDate = new Date(transaction.createdAt.getTime() + TWO_HOURS);
         scheduleTask(`expire-${transaction.id}`, expirationDate, async () => {
           await handleExpiration(transaction.id);
         });
       }
-    }
 
-    if (transaction.status === "waitingConfirmation") {
-      const cancellationDate = new Date(
-        transaction.createdAt.getTime() + 3 * 24 * 60 * 60 * 1000
-      );
-      if (cancellationDate > new Date()) {
+      if (transaction.status === "waitingConfirmation") {
+        const cancellationDate = new Date(transaction.createdAt.getTime() + THREE_DAYS);
         scheduleTask(`cancel-${transaction.id}`, cancellationDate, async () => {
           await handleCancellation(transaction.id);
         });
       }
-    }
-  }
-};
-
-// Fungsi untuk menangani transaksi kedaluwarsa
-const handleExpiration = async (transactionId: number) => {
-  const transaction = await prisma.transaction.findUnique({
-    where: { id: transactionId },
-  });
-
-  if (!transaction || transaction.status !== "waitingPayment") {
-    console.log(`Transaksi ${transactionId} sudah diproses.`);
-    return;
-  }
-
-  await prisma.transaction.update({
-    where: { id: transactionId },
-    data: { status: "expired" },
-  });
-
-  // Rollback availableSeat pada event
-  await prisma.event.update({
-    where: { id: transaction.eventId },
-    data: { availableSeat: { increment: transaction.ticketCount } },
-  });
-
-  // Rollback voucher jika digunakan
-  if (transaction.voucherId) {
-    await prisma.voucher.update({
-      where: { id: transaction.voucherId },
-      data: {
-        usedQty: { decrement: 1 },
-        qty: { increment: 1 },
-      },
-    });
-  }
-
-  // Rollback poin jika digunakan
-  if (transaction.pointUse) {
-    await prisma.user.update({
-      where: { id: transaction.userId },
-      data: { point: { increment: transaction.pointUse } },
-    });
-  }
-
-  // Rollback kupon jika digunakan
-  if (transaction.couponId) {
-    await prisma.coupon.update({
-      where: { id: transaction.couponId },
-      data: { isUsed: false },
-    });
-  }
-
-  console.log(`Transaksi ${transactionId} diubah menjadi expired.`);
-};
-
-// Fungsi untuk menangani pembatalan transaksi
-const handleCancellation = async (transactionId: number) => {
-  const transaction = await prisma.transaction.findUnique({
-    where: { id: transactionId },
-  });
-
-  if (!transaction || transaction.status !== "waitingConfirmation") {
-    console.log(`Transaksi ${transactionId} sudah diproses.`);
-    return;
-  }
-
-  await prisma.transaction.update({
-    where: { id: transactionId },
-    data: { status: "cancelled" },
-  });
-
-  // Rollback availableSeat pada event
-  await prisma.event.update({
-    where: { id: transaction.eventId },
-    data: { availableSeat: { increment: transaction.ticketCount } },
-  });
-
-  // Rollback voucher jika digunakan
-  if (transaction.voucherId) {
-    await prisma.voucher.update({
-      where: { id: transaction.voucherId },
-      data: {
-        usedQty: { decrement: 1 },
-        qty: { increment: 1 },
-      },
-    });
-  }
-
-  // Rollback poin jika digunakan
-  if (transaction.pointUse) {
-    await prisma.user.update({
-      where: { id: transaction.userId },
-      data: { point: { increment: transaction.pointUse } },
-    });
-  }
-
-  // Rollback kupon jika digunakan
-  if (transaction.couponId) {
-    await prisma.coupon.update({
-      where: { id: transaction.couponId },
-      data: { isUsed: false },
-    });
-  }
-
-  console.log(`Transaksi ${transactionId} diubah menjadi cancelled.`);
+    })
+  );
 };
 
 // Fungsi untuk membuat transaksi baru
@@ -201,25 +154,11 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
     if (body.voucherId) {
       const voucher = await prisma.voucher.findUnique({
         where: { id: body.voucherId },
-        select: {
-          value: true,
-          qty: true,
-          usedQty: true,
-          expDate: true,
-          eventId: true,
-        },
+        select: { value: true, qty: true, usedQty: true, expDate: true, eventId: true },
       });
 
-      if (!voucher || voucher.qty <= voucher.usedQty) {
-        throw new Error("Voucher tidak valid atau sudah digunakan.");
-      }
-
-      if (voucher.expDate < new Date()) {
-        throw new Error("Voucher kadaluwarsa.");
-      }
-
-      if (voucher.eventId !== body.eventId) {
-        throw new Error("Voucher tidak berlaku untuk event ini.");
+      if (!voucher || voucher.qty <= voucher.usedQty || voucher.expDate < new Date() || voucher.eventId !== body.eventId) {
+        throw new Error("Voucher tidak valid.");
       }
 
       totalDiscount += voucher.value;
@@ -232,16 +171,8 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         select: { userId: true, isUsed: true, value: true, expiredAt: true },
       });
 
-      if (!coupon || coupon.isUsed) {
-        throw new Error("Kupon tidak valid atau sudah digunakan.");
-      }
-
-      if (coupon.expiredAt < new Date()) {
-        throw new Error("Kupon kadaluwarsa.");
-      }
-
-      if (coupon.userId !== body.userId) {
-        throw new Error("Kupon ini bukan milik Anda.");
+      if (!coupon || coupon.isUsed || coupon.expiredAt < new Date() || coupon.userId !== body.userId) {
+        throw new Error("Kupon tidak valid.");
       }
 
       totalDiscount += coupon.value;
@@ -254,24 +185,18 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
         select: { point: true, pointExpiredDate: true },
       });
 
-      if (!user || user.point < body.pointsUse) {
-        throw new Error("Poin tidak mencukupi.");
-      }
-
-      if (!user.pointExpiredDate || user.pointExpiredDate < new Date()) {
-        throw new Error("Poin telah kadaluwarsa.");
+      if (!user || user.point < body.pointsUse || !(user.pointExpiredDate instanceof Date) || user.pointExpiredDate < new Date()) {
+        throw new Error("Poin tidak mencukupi atau telah kadaluwarsa.");
       }
 
       totalDiscount += body.pointsUse;
     }
 
     const finalAmount = totalPrice - totalDiscount;
-
     if (finalAmount < 0) {
       throw new Error("Harga akhir tidak bisa negatif.");
     }
 
-    // Buat transaksi baru
     const transaction = await prisma.transaction.create({
       data: {
         userId: body.userId,
@@ -283,69 +208,23 @@ export const createTransactionService = async (body: CreateTransactionBody) => {
       },
     });
 
-    // Cek apakah transaksi sudah kadaluwarsa sebelum mengizinkan upload bukti pembayaran
-    if (body.paymentProofUploaded) {
-      const currentDate = new Date();
-      const expiryDate = new Date(transaction.createdAt.getTime() + 1 * 60 * 1000); // 2 jam setelah transaksi dibuat
-
-      if (currentDate > expiryDate) {
-        throw new Error("Transaksi sudah kadaluwarsa, tidak dapat mengunggah bukti pembayaran.");
-      }
-
-      await prisma.transaction.update({
-        where: { id: transaction.id },
-        data: { status: "waitingConfirmation" },
-      });
-    }
-
-    // Update voucher, poin, dan kupon jika digunakan
-    if (body.voucherId) {
-      await prisma.voucher.update({
-        where: { id: body.voucherId },
-        data: { usedQty: { increment: 1 }, qty: { decrement: 1 } },
-      });
-    }
-
-    if (body.pointsUse) {
-      await prisma.user.update({
-        where: { id: body.userId },
-        data: { point: { decrement: body.pointsUse } },
-      });
-    }
-
-    if (body.couponId) {
-      await prisma.coupon.update({
-        where: { id: body.couponId },
-        data: { isUsed: true },
-      });
-    }
-
-    // Update kapasitas event
-    await prisma.event.update({
-      where: { id: body.eventId },
-      data: { availableSeat: { decrement: body.ticketCount } },
-    });
-
-    // Penjadwalan tugas pembatalan dan kedaluwarsa
+    // Penjadwalan tugas
     const currentDate = new Date();
     if (!body.paymentProofUploaded) {
-      const expiryDate = new Date(currentDate.getTime() + 1 * 60 * 1000); // 2 jam
+      const expiryDate = new Date(currentDate.getTime() + TWO_HOURS);
       scheduleTask(`expire-${transaction.id}`, expiryDate, async () => {
         await handleExpiration(transaction.id);
-
       });
-    }
-
-    if (body.paymentProofUploaded) {
-      const confirmationExpiryDate = new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 hari
+    } else {
+      const confirmationExpiryDate = new Date(currentDate.getTime() + THREE_DAYS);
       scheduleTask(`cancel-${transaction.id}`, confirmationExpiryDate, async () => {
         await handleCancellation(transaction.id);
-
       });
     }
 
     return transaction;
   } catch (error) {
+    console.error("Error in createTransactionService:", error);
     throw error;
   }
 };
