@@ -40,7 +40,7 @@ export const registerService = async (body: User) => {
       }
 
       referredBy = referringUser?.id;
-      // point
+
       await prisma.user.update({
         where: { id: referredBy },
         data: {
@@ -62,7 +62,6 @@ export const registerService = async (body: User) => {
         password: hashedPassword,
         referralCode: newReferralcode,
         referredBy,
-        pointExpiredDate: referredBy ? addDays(new Date(), 90) : null,
       },
     });
 
