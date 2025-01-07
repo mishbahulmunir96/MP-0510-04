@@ -1,33 +1,25 @@
 import prisma from "../../lib/prisma";
 
-interface GetTransactionsByOrganizerQuery {
-  organizerId: number;
+interface GetPurchaseHistoryQuery {
+  userId: number;
   page: number;
   take: number;
 }
 
-export const getTransactionsByOrganizerService = async ({
-  organizerId,
+export const getPurchaseHistoryService = async ({
+  userId,
   page,
   take,
-}: GetTransactionsByOrganizerQuery) => {
+}: GetPurchaseHistoryQuery) => {
   try {
     const transactions = await prisma.transaction.findMany({
-      where: {
-        event: {
-          userId: organizerId,
-        },
-      },
+      where: { userId },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
-        },
         event: {
           select: {
             title: true,
+            price: true,
+            startTime: true,
           },
         },
       },
@@ -36,11 +28,7 @@ export const getTransactionsByOrganizerService = async ({
     });
 
     const totalCount = await prisma.transaction.count({
-      where: {
-        event: {
-          userId: organizerId,
-        },
-      },
+      where: { userId },
     });
 
     return {

@@ -1,4 +1,3 @@
-// controller/attendees/getAttendeesByEvent.controller.ts
 import { NextFunction, Request, Response } from "express";
 import { getAttendeesByEventService } from "../services/attendee/getAttendeesByEvent.service";
 import prisma from "../lib/prisma";
@@ -15,7 +14,6 @@ export const getAttendeesByEventController = async (
       throw new Error("Invalid event ID");
     }
 
-    // Pastikan hanya organizer yang dapat mengakses data attendees
     const userId = res.locals.user.id;
     const event = await prisma.event.findUnique({
       where: { id: eventId },
@@ -26,7 +24,13 @@ export const getAttendeesByEventController = async (
       throw new Error("Unauthorized access");
     }
 
-    const attendees = await getAttendeesByEventService(eventId);
+    const { page = 1, take = 10 } = req.query;
+
+    const attendees = await getAttendeesByEventService({
+      eventId,
+      page: Number(page),
+      take: Number(take),
+    });
 
     res.status(200).json(attendees);
   } catch (error) {

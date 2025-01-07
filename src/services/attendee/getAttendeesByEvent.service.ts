@@ -1,9 +1,19 @@
 import prisma from "../../lib/prisma";
 
-export const getAttendeesByEventService = async (eventId: number) => {
+interface GetAttendeesByEventQuery {
+  eventId: number;
+  page: number;
+  take: number;
+}
+
+export const getAttendeesByEventService = async ({
+  eventId,
+  page,
+  take,
+}: GetAttendeesByEventQuery) => {
   try {
     const attendees = await prisma.transaction.findMany({
-      where: { eventId, status: "done" }, // Hanya transaksi dengan status "done" yang dianggap sebagai attendees
+      where: { eventId, status: "done" },
       select: {
         user: {
           select: {
@@ -15,14 +25,30 @@ export const getAttendeesByEventService = async (eventId: number) => {
         ticketCount: true,
         amount: true,
       },
+      skip: (page - 1) * take,
+      take,
     });
 
-    return attendees.map((attendee) => ({
+    const totalCount = await prisma.transaction.count({
+      where: { eventId, status: "done" },
+    });
+
+    const attendeesDetail = attendees.map((attendee) => ({
       name: `${attendee.user.firstName} ${attendee.user.lastName}`,
       email: attendee.user.email,
       ticketCount: attendee.ticketCount,
       totalPrice: attendee.amount,
     }));
+
+    return {
+      data: attendeesDetail,
+      meta: {
+        page,
+        take,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / take),
+      },
+    };
   } catch (error) {
     throw error;
   }

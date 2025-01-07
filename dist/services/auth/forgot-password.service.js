@@ -17,7 +17,7 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const config_1 = require("../../config");
 const nodemailer_1 = require("../../lib/nodemailer");
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const resetPasswordEmail_1 = require("../../lib/resetPasswordEmail");
+const resetPasswordEmail_1 = require("../../templates/resetPasswordEmail");
 const forgotPasswordService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = body;

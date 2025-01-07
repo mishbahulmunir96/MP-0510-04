@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateEventController = exports.createEventController = exports.getEventController = exports.getEventsByUserController = exports.getEventsController = void 0;
+exports.updateEventController = exports.createEventController = exports.getEventController = exports.getEventsByOrganizerController = exports.getEventsController = void 0;
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const create_event_service_1 = require("../services/event/create-event.service");
 const get_event_service_1 = require("../services/event/get-event.service");
-const get_events_by_user_service_1 = require("../services/event/get-events-by-user.service");
+const get_events_by_organizer_service_1 = require("../services/event/get-events-by-organizer.service");
 const get_events_service_1 = require("../services/event/get-events.service");
 const update_event_service_1 = require("../services/event/update-event.service");
 const getEventsController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,17 +38,17 @@ const getEventsController = (req, res, next) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.getEventsController = getEventsController;
-const getEventsByUserController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getEventsByOrganizerController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.user.id;
-        const result = yield (0, get_events_by_user_service_1.getEventsByUserService)(userId);
+        const result = yield (0, get_events_by_organizer_service_1.getEventsByOrganizerService)(userId);
         res.status(200).send(result);
     }
     catch (error) {
         next(error);
     }
 });
-exports.getEventsByUserController = getEventsByUserController;
+exports.getEventsByOrganizerController = getEventsByOrganizerController;
 const getEventController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = Number(req.params.id);

@@ -17,7 +17,6 @@ const prisma_1 = __importDefault(require("../../lib/prisma"));
 const cloudinary_1 = require("../../lib/cloudinary");
 const uploadPaymentProofService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ transactionId, paymentProof, }) {
     try {
-        // Periksa apakah transaksi ada dan dalam status yang valid
         const transaction = yield prisma_1.default.transaction.findUnique({
             where: { id: transactionId },
         });
@@ -27,17 +26,15 @@ const uploadPaymentProofService = (_a) => __awaiter(void 0, [_a], void 0, functi
         if (transaction.status === "cancelled") {
             throw new Error("Transaction has been cancelled. Cannot upload proof.");
         }
-        // Mengupload file ke Cloudinary
         const { secure_url } = yield (0, cloudinary_1.cloudinaryUpload)(paymentProof);
-        // Update transaksi dengan URL bukti pembayaran
         const updatedTransaction = yield prisma_1.default.transaction.update({
             where: { id: transactionId },
             data: {
-                paymentProof: secure_url, // Menyimpan URL bukti pembayaran
-                status: "waitingConfirmation", // Mengubah status menjadi 'waitingConfirmation'
+                paymentProof: secure_url,
+                status: "waitingConfirmation",
             },
         });
-        return updatedTransaction; // Mengembalikan transaksi yang telah diperbarui
+        return updatedTransaction;
     }
     catch (error) {
         throw error;

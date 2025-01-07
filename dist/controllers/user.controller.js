@@ -9,31 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserController = exports.getUserController = exports.getUsersController = void 0;
-const get_user_service_1 = require("../services/user/get-user.service");
+exports.updateUserController = void 0;
 const update_user_service_1 = require("../services/user/update-user.service");
-const get_users_service_1 = require("../services/user/get-users.service");
-const getUsersController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield (0, get_users_service_1.getUsersService)();
-        res.status(200).send(result);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.getUsersController = getUsersController;
-const getUserController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const id = Number(req.params.id);
-        const result = yield (0, get_user_service_1.getUserService)(id);
-        res.status(200).send(result);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.getUserController = getUserController;
 const updateUserController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const profilePicture = req.file;

@@ -21,7 +21,6 @@ const getAttendeesByEventController = (req, res, next) => __awaiter(void 0, void
         if (isNaN(eventId)) {
             throw new Error("Invalid event ID");
         }
-        // Pastikan hanya organizer yang dapat mengakses data attendees
         const userId = res.locals.user.id;
         const event = yield prisma_1.default.event.findUnique({
             where: { id: eventId },
@@ -30,7 +29,12 @@ const getAttendeesByEventController = (req, res, next) => __awaiter(void 0, void
         if (!event || event.userId !== userId) {
             throw new Error("Unauthorized access");
         }
-        const attendees = yield (0, getAttendeesByEvent_service_1.getAttendeesByEventService)(eventId);
+        const { page = 1, take = 10 } = req.query;
+        const attendees = yield (0, getAttendeesByEvent_service_1.getAttendeesByEventService)({
+            eventId,
+            page: Number(page),
+            take: Number(take),
+        });
         res.status(200).json(attendees);
     }
     catch (error) {

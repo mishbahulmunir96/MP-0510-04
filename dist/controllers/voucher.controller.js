@@ -26,7 +26,12 @@ exports.createVoucherController = createVoucherController;
 const getVouchersController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.user.id;
-        const result = yield (0, get_vouchers_service_1.getVouchersService)(userId);
+        const { page = 1, take = 10 } = req.query;
+        const result = yield (0, get_vouchers_service_1.getVouchersService)({
+            userId,
+            page: Number(page),
+            take: Number(take),
+        });
         res.status(200).send(result);
     }
     catch (error) {

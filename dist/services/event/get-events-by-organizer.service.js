@@ -12,31 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getVouchersService = void 0;
+exports.getEventsByOrganizerService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const getVouchersService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ userId, page, take, }) {
+const getEventsByOrganizerService = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const vouchers = yield prisma_1.default.voucher.findMany({
-            where: { userId },
-            include: { event: true },
-            skip: (page - 1) * take,
-            take,
+        return yield prisma_1.default.event.findMany({
+            where: { userId: userId },
         });
-        const totalCount = yield prisma_1.default.voucher.count({
-            where: { userId },
-        });
-        return {
-            data: vouchers,
-            meta: {
-                page,
-                take,
-                total: totalCount,
-                totalPages: Math.ceil(totalCount / take),
-            },
-        };
     }
     catch (error) {
         throw error;
     }
 });
-exports.getVouchersService = getVouchersService;
+exports.getEventsByOrganizerService = getEventsByOrganizerService;

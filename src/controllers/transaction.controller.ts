@@ -5,6 +5,7 @@ import { uploadPaymentProofService } from "../services/transaction/upload-paymen
 import { getTransactionsByOrganizerService } from "../services/transaction/get-transactions-by-organizer.service";
 import { updateTransactionStatusService } from "../services/transaction/update-transaction-status.service";
 import { Status } from "../../prisma/generated/client";
+import { getPurchaseHistoryService } from "../services/transaction/get-purchase-history.service";
 
 export const createTransactionController = async (
   req: Request,
@@ -20,7 +21,7 @@ export const createTransactionController = async (
       ticketCount: req.body.ticketCount,
       voucherId: req.body.voucherId,
       couponId: req.body.couponId,
-      pointsUse: req.body.pointsUse, 
+      pointsUse: req.body.pointsUse,
 
       paymentProofUploaded: req.body.paymentProofUploaded || false,
     };
@@ -53,9 +54,14 @@ export const getTransactionsByOrganizerController = async (
   next: NextFunction
 ) => {
   try {
-    const userId = res.locals.user.id;
+    const organizerId = res.locals.user.id;
+    const { page = 1, take = 10 } = req.query;
 
-    const result = await getTransactionsByOrganizerService(userId);
+    const result = await getTransactionsByOrganizerService({
+      organizerId,
+      page: Number(page),
+      take: Number(take),
+    });
 
     res.status(200).send(result);
   } catch (error) {
@@ -107,6 +113,27 @@ export const updateTransactionStatusController = async (
     );
 
     res.status(200).json(updatedTransaction);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPurchaseHistoryController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = res.locals.user.id;
+    const { page = 1, take = 10 } = req.query;
+
+    const purchaseHistory = await getPurchaseHistoryService({
+      userId,
+      page: Number(page),
+      take: Number(take),
+    });
+
+    res.status(200).json(purchaseHistory);
   } catch (error) {
     next(error);
   }

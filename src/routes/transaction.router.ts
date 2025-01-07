@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createTransactionController,
+  getPurchaseHistoryController,
   getTransactionController,
   getTransactionsByOrganizerController,
   updateTransactionStatusController,
@@ -15,21 +16,19 @@ import { checkUserRole } from "../lib/checkUserRole";
 const router = express.Router();
 
 router.get(
-  "/byorg",
+  "/organizer",
   verifyToken,
   checkUserRole,
   getTransactionsByOrganizerController
 );
-
+router.get("/purchase-history", verifyToken, getPurchaseHistoryController);
 router.get("/:id", verifyToken, getTransactionController);
-
 router.post(
   "/",
   verifyToken,
-  validateCreateTransaction, 
+  validateCreateTransaction,
   createTransactionController
 );
-
 router.patch(
   "/:id",
   verifyToken,
