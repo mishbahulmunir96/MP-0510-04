@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateTransactionStatusService = void 0;
 const client_1 = require("../../../prisma/generated/client");
 const nodemailer_1 = require("../../lib/nodemailer");
-const notificationTrxEmail_1 = require("../../lib/notificationTrxEmail");
+const notificationTrxEmail_1 = require("../../templates/notificationTrxEmail");
 const prisma_1 = __importDefault(require("../../lib/prisma"));
 const updateTransactionStatusService = (transactionId, status) => __awaiter(void 0, void 0, void 0, function* () {
     try {

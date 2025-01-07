@@ -38,7 +38,6 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
                 throw new Error("Invalid referral code");
             }
             referredBy = referringUser === null || referringUser === void 0 ? void 0 : referringUser.id;
-            // point
             yield prisma_1.default.user.update({
                 where: { id: referredBy },
                 data: {
@@ -59,7 +58,6 @@ const registerService = (body) => __awaiter(void 0, void 0, void 0, function* ()
                 password: hashedPassword,
                 referralCode: newReferralcode,
                 referredBy,
-                pointExpiredDate: referredBy ? (0, date_fns_1.addDays)(new Date(), 90) : null,
             },
         });
         if (referredBy) {

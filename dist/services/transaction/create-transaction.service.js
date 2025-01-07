@@ -12,78 +12,168 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTransactionService = void 0;
-const prisma_1 = __importDefault(require("../../lib/prisma"));
+exports.cancelTask = exports.scheduleTask = exports.loadJobs = exports.createTransactionService = void 0;
 const node_schedule_1 = __importDefault(require("node-schedule"));
+const prisma_1 = __importDefault(require("../../lib/prisma"));
+// Durasi dalam milidetik
+const TWO_HOURS = 2 * 60 * 60 * 1000;
+const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+// Fungsi untuk menjadwalkan tugas
+const scheduleTask = (name, date, task) => {
+    if (date > new Date()) {
+        node_schedule_1.default.scheduleJob(name, date, () => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                yield task();
+            }
+            catch (error) {
+                console.error(`Error in task ${name}:`, error);
+            }
+        }));
+    }
+    else {
+        console.warn(`Skipped scheduling task ${name} due to past date.`);
+    }
+};
+exports.scheduleTask = scheduleTask;
+// Fungsi untuk membatalkan tugas terjadwal
+const cancelTask = (name) => {
+    const job = node_schedule_1.default.scheduledJobs[name];
+    if (job) {
+        job.cancel();
+    }
+    else {
+        console.warn(`Task ${name} not found to cancel.`);
+    }
+};
+exports.cancelTask = cancelTask;
+// Fungsi untuk rollback transaksi
+const rollbackTransaction = (transaction) => __awaiter(void 0, void 0, void 0, function* () {
+    if (transaction.voucherId) {
+        yield prisma_1.default.voucher.update({
+            where: { id: transaction.voucherId },
+            data: { usedQty: { decrement: 1 }, qty: { increment: 1 } },
+        });
+    }
+    if (transaction.pointUse) {
+        yield prisma_1.default.user.update({
+            where: { id: transaction.userId },
+            data: { point: { increment: transaction.pointUse } },
+        });
+    }
+    if (transaction.couponId) {
+        yield prisma_1.default.coupon.update({
+            where: { id: transaction.couponId },
+            data: { isUsed: false },
+        });
+    }
+    yield prisma_1.default.event.update({
+        where: { id: transaction.eventId },
+        data: { availableSeat: { increment: transaction.ticketCount } },
+    });
+});
+// Fungsi untuk menangani transaksi kedaluwarsa
+const handleExpiration = (transactionId) => __awaiter(void 0, void 0, void 0, function* () {
+    const transaction = yield prisma_1.default.transaction.findUnique({
+        where: { id: transactionId },
+    });
+    if (!transaction || transaction.status !== "waitingPayment") {
+        return;
+    }
+    yield prisma_1.default.transaction.update({
+        where: { id: transactionId },
+        data: { status: "expired" },
+    });
+    yield rollbackTransaction(transaction);
+});
+// Fungsi untuk menangani pembatalan transaksi
+const handleCancellation = (transactionId) => __awaiter(void 0, void 0, void 0, function* () {
+    const transaction = yield prisma_1.default.transaction.findUnique({
+        where: { id: transactionId },
+    });
+    if (!transaction || transaction.status !== "waitingConfirmation") {
+        return;
+    }
+    yield prisma_1.default.transaction.update({
+        where: { id: transactionId },
+        data: { status: "cancelled" },
+    });
+    yield rollbackTransaction(transaction);
+});
+// Fungsi untuk memuat ulang jadwal dari database
+const loadJobs = () => __awaiter(void 0, void 0, void 0, function* () {
+    const pendingTransactions = yield prisma_1.default.transaction.findMany({
+        where: {
+            status: { in: ["waitingPayment", "waitingConfirmation"] },
+        },
+    });
+    yield Promise.all(pendingTransactions.map((transaction) => __awaiter(void 0, void 0, void 0, function* () {
+        if (transaction.status === "waitingPayment") {
+            const expirationDate = new Date(transaction.createdAt.getTime() + TWO_HOURS);
+            scheduleTask(`expire-${transaction.id}`, expirationDate, () => __awaiter(void 0, void 0, void 0, function* () {
+                yield handleExpiration(transaction.id);
+            }));
+        }
+        if (transaction.status === "waitingConfirmation") {
+            const cancellationDate = new Date(transaction.createdAt.getTime() + THREE_DAYS);
+            scheduleTask(`cancel-${transaction.id}`, cancellationDate, () => __awaiter(void 0, void 0, void 0, function* () {
+                yield handleCancellation(transaction.id);
+            }));
+        }
+    })));
+});
+exports.loadJobs = loadJobs;
+// Fungsi untuk membuat transaksi baru
 const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const event = yield prisma_1.default.event.findUnique({
             where: { id: body.eventId },
-            select: { price: true },
+            select: { price: true, availableSeat: true },
         });
         if (!event) {
-            throw new Error("Event tidak ditemukan");
+            throw new Error("Event tidak ditemukan.");
+        }
+        if (event.availableSeat < body.ticketCount) {
+            throw new Error("Jumlah tiket melebihi kapasitas yang tersedia.");
         }
         const pricePerTicket = event.price || 0;
         const totalPrice = pricePerTicket * body.ticketCount;
         let totalDiscount = 0;
-        // Validasi Voucher jika ada
+        // Validasi Voucher
         if (body.voucherId) {
             const voucher = yield prisma_1.default.voucher.findUnique({
                 where: { id: body.voucherId },
-                select: {
-                    value: true,
-                    qty: true,
-                    usedQty: true,
-                    expDate: true,
-                    eventId: true,
-                },
+                select: { value: true, qty: true, usedQty: true, expDate: true, eventId: true },
             });
-            if (!voucher || voucher.qty <= voucher.usedQty) {
-                throw new Error("Voucher tidak valid atau sudah terpakai.");
+            if (!voucher || voucher.qty <= voucher.usedQty || voucher.expDate < new Date() || voucher.eventId !== body.eventId) {
+                throw new Error("Voucher tidak valid.");
             }
-            if (voucher.expDate < new Date()) {
-                throw new Error("Voucher kadaluwarsa");
-            }
-            if (voucher.eventId !== body.eventId) {
-                throw new Error("Voucher tidak berlaku untuk event ini.");
-            }
-            totalDiscount += voucher.value; // Tambahkan diskon dari voucher
+            totalDiscount += voucher.value;
         }
+        // Validasi Kupon
         if (body.couponId) {
             const coupon = yield prisma_1.default.coupon.findUnique({
                 where: { id: body.couponId },
                 select: { userId: true, isUsed: true, value: true, expiredAt: true },
             });
-            if (!coupon || coupon.isUsed) {
-                throw new Error("Kupon tidak valid atau sudah digunakan.");
+            if (!coupon || coupon.isUsed || coupon.expiredAt < new Date() || coupon.userId !== body.userId) {
+                throw new Error("Kupon tidak valid.");
             }
-            if (coupon.expiredAt < new Date()) {
-                throw new Error("Kupon telah kedaluwarsa.");
-            }
-            if (coupon.userId !== body.userId) {
-                throw new Error("Kupon ini bukan milik Anda.");
-            }
-            totalDiscount += coupon.value; // Tambahkan nilai kupon ke total diskon
+            totalDiscount += coupon.value;
         }
-        // Validasi Poin jika ada
-        if (body.pointsToUse && body.pointsToUse > 0) {
+        // Validasi Poin
+        if (body.pointsUse && body.pointsUse > 0) {
             const user = yield prisma_1.default.user.findUnique({
                 where: { id: body.userId },
                 select: { point: true, pointExpiredDate: true },
             });
-            if (!user || user.point < body.pointsToUse) {
-                throw new Error("Poin tidak cukup.");
+            if (!user || user.point < body.pointsUse || !(user.pointExpiredDate instanceof Date) || user.pointExpiredDate < new Date()) {
+                throw new Error("Poin tidak mencukupi atau telah kadaluwarsa.");
             }
-            if (user.pointExpiredDate === null ||
-                user.pointExpiredDate < new Date()) {
-                throw new Error("Poin telah kadaluwarsa.");
-            }
-            totalDiscount += body.pointsToUse; // Tambahkan poin yang digunakan ke total diskon
+            totalDiscount += body.pointsUse;
         }
         const finalAmount = totalPrice - totalDiscount;
         if (finalAmount < 0) {
-            throw new Error("Harga akhir tidak bisa negatif");
+            throw new Error("Harga akhir tidak bisa negatif.");
         }
         const transaction = yield prisma_1.default.transaction.create({
             data: {
@@ -91,189 +181,28 @@ const createTransactionService = (body) => __awaiter(void 0, void 0, void 0, fun
                 eventId: body.eventId,
                 amount: finalAmount,
                 ticketCount: body.ticketCount,
-                status: body.paymentProofUploaded
-                    ? "waitingConfirmation"
-                    : "waitingPayment", // Atur status awal
+                status: body.paymentProofUploaded ? "waitingConfirmation" : "waitingPayment",
                 createdAt: new Date(),
             },
         });
-        // Jika bukti pembayaran diunggah, update status transaksi
-        if (body.paymentProofUploaded) {
-            yield prisma_1.default.transaction.update({
-                where: { id: transaction.id },
-                data: { status: "waitingConfirmation" }, // Ubah status menjadi waitingConfirmation
-            });
-        }
-        // Update voucher jika digunakan
-        if (body.voucherId) {
-            yield prisma_1.default.voucher.update({
-                where: { id: body.voucherId },
-                data: {
-                    usedQty: {
-                        increment: 1,
-                    },
-                    qty: {
-                        decrement: 1,
-                    },
-                },
-            });
-        }
-        // Update poin pengguna jika digunakan
-        if (body.pointsToUse) {
-            yield prisma_1.default.user.update({
-                where: { id: body.userId },
-                data: {
-                    point: {
-                        decrement: body.pointsToUse,
-                    },
-                },
-            });
-        }
-        // Update kupon jika digunakan
-        if (body.couponId) {
-            yield prisma_1.default.coupon.update({
-                where: { id: body.couponId },
-                data: {
-                    isUsed: true,
-                },
-            });
-        }
-        // Update availableSeat pada event
-        yield prisma_1.default.event.update({
-            where: { id: body.eventId },
-            data: {
-                availableSeat: {
-                    decrement: body.ticketCount,
-                },
-            },
-        });
-        // Jadwal pembatalan setelah 2jam jika status masih "waitingPayment"
+        // Penjadwalan tugas
+        const currentDate = new Date();
         if (!body.paymentProofUploaded) {
-            node_schedule_1.default.scheduleJob(Date.now() + 2 * 60 * 60 * 1000, () => __awaiter(void 0, void 0, void 0, function* () {
-                try {
-                    const transactionToCheck = yield prisma_1.default.transaction.findUnique({
-                        where: { id: transaction.id },
-                    });
-                    if (transactionToCheck &&
-                        transactionToCheck.status === "waitingPayment") {
-                        yield prisma_1.default.transaction.update({
-                            where: { id: transaction.id },
-                            data: { status: "expired" },
-                        });
-                        // Rollback availableSeat
-                        yield prisma_1.default.event.update({
-                            where: { id: transaction.eventId },
-                            data: {
-                                availableSeat: {
-                                    increment: transaction.ticketCount,
-                                },
-                            },
-                        });
-                        // Rollback voucher
-                        if (body.voucherId) {
-                            yield prisma_1.default.voucher.update({
-                                where: { id: body.voucherId },
-                                data: {
-                                    usedQty: {
-                                        decrement: 1,
-                                    },
-                                    qty: {
-                                        increment: 1,
-                                    },
-                                },
-                            });
-                        }
-                        // Rollback poin
-                        if (body.pointsToUse) {
-                            yield prisma_1.default.user.update({
-                                where: { id: body.userId },
-                                data: {
-                                    point: {
-                                        increment: body.pointsToUse,
-                                    },
-                                },
-                            });
-                        }
-                        // Rollback kupon
-                        if (body.couponId) {
-                            yield prisma_1.default.coupon.update({
-                                where: { id: body.couponId },
-                                data: {
-                                    isUsed: false,
-                                },
-                            });
-                        }
-                    }
-                }
-                catch (error) {
-                    console.error("Kesalahan saat pembatalan terjadwal:", error);
-                }
+            const expiryDate = new Date(currentDate.getTime() + TWO_HOURS);
+            scheduleTask(`expire-${transaction.id}`, expiryDate, () => __awaiter(void 0, void 0, void 0, function* () {
+                yield handleExpiration(transaction.id);
             }));
         }
-        // Jadwal pembatalan setelah 3 hari jika status masih "waitingConfirmation"
-        node_schedule_1.default.scheduleJob(Date.now() + 3 * 24 * 60 * 60 * 1000, () => __awaiter(void 0, void 0, void 0, function* () {
-            try {
-                const transactionToCheck = yield prisma_1.default.transaction.findUnique({
-                    where: { id: transaction.id },
-                });
-                if (transactionToCheck &&
-                    transactionToCheck.status === "waitingConfirmation") {
-                    yield prisma_1.default.transaction.update({
-                        where: { id: transaction.id },
-                        data: { status: "cancelled" },
-                    });
-                    // Rollback availableSeat
-                    yield prisma_1.default.event.update({
-                        where: { id: transaction.eventId },
-                        data: {
-                            availableSeat: {
-                                increment: transaction.ticketCount,
-                            },
-                        },
-                    });
-                    // Rollback voucher jika digunakan
-                    if (body.voucherId) {
-                        yield prisma_1.default.voucher.update({
-                            where: { id: body.voucherId },
-                            data: {
-                                usedQty: {
-                                    decrement: 1,
-                                },
-                                qty: {
-                                    increment: 1,
-                                },
-                            },
-                        });
-                    }
-                    // Rollback poin jika digunakan
-                    if (body.pointsToUse) {
-                        yield prisma_1.default.user.update({
-                            where: { id: body.userId },
-                            data: {
-                                point: {
-                                    increment: body.pointsToUse,
-                                },
-                            },
-                        });
-                    }
-                    // Rollback kupon jika digunakan
-                    if (body.couponId) {
-                        yield prisma_1.default.coupon.update({
-                            where: { id: body.couponId },
-                            data: {
-                                isUsed: false,
-                            },
-                        });
-                    }
-                }
-            }
-            catch (error) {
-                console.error("Kesalahan saat pembatalan terjadwal:", error);
-            }
-        }));
+        else {
+            const confirmationExpiryDate = new Date(currentDate.getTime() + THREE_DAYS);
+            scheduleTask(`cancel-${transaction.id}`, confirmationExpiryDate, () => __awaiter(void 0, void 0, void 0, function* () {
+                yield handleCancellation(transaction.id);
+            }));
+        }
         return transaction;
     }
     catch (error) {
+        console.error("Error in createTransactionService:", error);
         throw error;
     }
 });

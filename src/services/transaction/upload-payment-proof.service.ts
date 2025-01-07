@@ -2,8 +2,8 @@ import prisma from "../../lib/prisma";
 import { cloudinaryUpload } from "../../lib/cloudinary";
 
 interface UploadPaymentProofBody {
-  transactionId: number; // ID transaksi yang ingin diupdate
-  paymentProof: Express.Multer.File; // Bukti pembayaran yang diupload
+  transactionId: number;
+  paymentProof: Express.Multer.File;
 }
 
 export const uploadPaymentProofService = async ({
@@ -11,7 +11,6 @@ export const uploadPaymentProofService = async ({
   paymentProof,
 }: UploadPaymentProofBody) => {
   try {
-    // Periksa apakah transaksi ada dan dalam status yang valid
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
     });
@@ -24,19 +23,17 @@ export const uploadPaymentProofService = async ({
       throw new Error("Transaction has been cancelled. Cannot upload proof.");
     }
 
-    // Mengupload file ke Cloudinary
     const { secure_url } = await cloudinaryUpload(paymentProof);
 
-    // Update transaksi dengan URL bukti pembayaran
     const updatedTransaction = await prisma.transaction.update({
       where: { id: transactionId },
       data: {
-        paymentProof: secure_url, // Menyimpan URL bukti pembayaran
-        status: "waitingConfirmation", // Mengubah status menjadi 'waitingConfirmation'
+        paymentProof: secure_url,
+        status: "waitingConfirmation",
       },
     });
 
-    return updatedTransaction; // Mengembalikan transaksi yang telah diperbarui
+    return updatedTransaction;
   } catch (error) {
     throw error;
   }

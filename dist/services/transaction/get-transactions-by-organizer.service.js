@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTransactionsByOrganizerService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const getTransactionsByOrganizerService = (organizerId) => __awaiter(void 0, void 0, void 0, function* () {
+const getTransactionsByOrganizerService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ organizerId, page, take, }) {
     try {
         const transactions = yield prisma_1.default.transaction.findMany({
             where: {
                 event: {
-                    userId: organizerId, // Ambil transaksi yang terkait dengan event yang dimiliki organizer
+                    userId: organizerId,
                 },
             },
             include: {
@@ -35,8 +35,25 @@ const getTransactionsByOrganizerService = (organizerId) => __awaiter(void 0, voi
                     },
                 },
             },
+            skip: (page - 1) * take,
+            take,
         });
-        return transactions;
+        const totalCount = yield prisma_1.default.transaction.count({
+            where: {
+                event: {
+                    userId: organizerId,
+                },
+            },
+        });
+        return {
+            data: transactions,
+            meta: {
+                page,
+                take,
+                total: totalCount,
+                totalPages: Math.ceil(totalCount / take),
+            },
+        };
     }
     catch (error) {
         throw error;

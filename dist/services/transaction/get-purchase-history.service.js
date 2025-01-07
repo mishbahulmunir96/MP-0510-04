@@ -12,21 +12,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getVouchersService = void 0;
+exports.getPurchaseHistoryService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const getVouchersService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ userId, page, take, }) {
+const getPurchaseHistoryService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ userId, page, take, }) {
     try {
-        const vouchers = yield prisma_1.default.voucher.findMany({
+        const transactions = yield prisma_1.default.transaction.findMany({
             where: { userId },
-            include: { event: true },
+            include: {
+                event: {
+                    select: {
+                        title: true,
+                        price: true,
+                        startTime: true,
+                    },
+                },
+            },
             skip: (page - 1) * take,
             take,
         });
-        const totalCount = yield prisma_1.default.voucher.count({
+        const totalCount = yield prisma_1.default.transaction.count({
             where: { userId },
         });
         return {
-            data: vouchers,
+            data: transactions,
             meta: {
                 page,
                 take,
@@ -39,4 +47,4 @@ const getVouchersService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ 
         throw error;
     }
 });
-exports.getVouchersService = getVouchersService;
+exports.getPurchaseHistoryService = getPurchaseHistoryService;

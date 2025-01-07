@@ -9,13 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTransactionStatusController = exports.uploadPaymentProofController = exports.getTransactionsByOrganizerController = exports.getTransactionController = exports.createTransactionController = void 0;
+exports.getPurchaseHistoryController = exports.updateTransactionStatusController = exports.uploadPaymentProofController = exports.getTransactionsByOrganizerController = exports.getTransactionController = exports.createTransactionController = void 0;
 const create_transaction_service_1 = require("../services/transaction/create-transaction.service");
 const get_transaction_service_1 = require("../services/transaction/get-transaction.service");
 const upload_payment_proof_service_1 = require("../services/transaction/upload-payment-proof.service");
 const get_transactions_by_organizer_service_1 = require("../services/transaction/get-transactions-by-organizer.service");
 const update_transaction_status_service_1 = require("../services/transaction/update-transaction-status.service");
-const client_1 = require("../../prisma/generated/client");
+const get_purchase_history_service_1 = require("../services/transaction/get-purchase-history.service");
 const createTransactionController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = res.locals.user.id;
@@ -25,8 +25,8 @@ const createTransactionController = (req, res, next) => __awaiter(void 0, void 0
             ticketCount: req.body.ticketCount,
             voucherId: req.body.voucherId,
             couponId: req.body.couponId,
-            pointsToUse: req.body.pointsToUse,
-            status: client_1.Status.waitingPayment,
+            pointsUse: req.body.pointsUse,
+            paymentProofUploaded: req.body.paymentProofUploaded || false,
         };
         const result = yield (0, create_transaction_service_1.createTransactionService)(transactionData);
         res.status(201).send(result);
@@ -49,8 +49,13 @@ const getTransactionController = (req, res, next) => __awaiter(void 0, void 0, v
 exports.getTransactionController = getTransactionController;
 const getTransactionsByOrganizerController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = res.locals.user.id;
-        const result = yield (0, get_transactions_by_organizer_service_1.getTransactionsByOrganizerService)(userId);
+        const organizerId = res.locals.user.id;
+        const { page = 1, take = 10 } = req.query;
+        const result = yield (0, get_transactions_by_organizer_service_1.getTransactionsByOrganizerService)({
+            organizerId,
+            page: Number(page),
+            take: Number(take),
+        });
         res.status(200).send(result);
     }
     catch (error) {
@@ -92,3 +97,19 @@ const updateTransactionStatusController = (req, res, next) => __awaiter(void 0, 
     }
 });
 exports.updateTransactionStatusController = updateTransactionStatusController;
+const getPurchaseHistoryController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = res.locals.user.id;
+        const { page = 1, take = 10 } = req.query;
+        const purchaseHistory = yield (0, get_purchase_history_service_1.getPurchaseHistoryService)({
+            userId,
+            page: Number(page),
+            take: Number(take),
+        });
+        res.status(200).json(purchaseHistory);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getPurchaseHistoryController = getPurchaseHistoryController;

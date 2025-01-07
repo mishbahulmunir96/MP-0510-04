@@ -14,10 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAttendeesByEventService = void 0;
 const prisma_1 = __importDefault(require("../../lib/prisma"));
-const getAttendeesByEventService = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
+const getAttendeesByEventService = (_a) => __awaiter(void 0, [_a], void 0, function* ({ eventId, page, take, }) {
     try {
         const attendees = yield prisma_1.default.transaction.findMany({
-            where: { eventId, status: "done" }, // Hanya transaksi dengan status "done" yang dianggap sebagai attendees
+            where: { eventId, status: "done" },
             select: {
                 user: {
                     select: {
@@ -29,13 +29,27 @@ const getAttendeesByEventService = (eventId) => __awaiter(void 0, void 0, void 0
                 ticketCount: true,
                 amount: true,
             },
+            skip: (page - 1) * take,
+            take,
         });
-        return attendees.map((attendee) => ({
+        const totalCount = yield prisma_1.default.transaction.count({
+            where: { eventId, status: "done" },
+        });
+        const attendeesDetail = attendees.map((attendee) => ({
             name: `${attendee.user.firstName} ${attendee.user.lastName}`,
             email: attendee.user.email,
             ticketCount: attendee.ticketCount,
             totalPrice: attendee.amount,
         }));
+        return {
+            data: attendeesDetail,
+            meta: {
+                page,
+                take,
+                total: totalCount,
+                totalPages: Math.ceil(totalCount / take),
+            },
+        };
     }
     catch (error) {
         throw error;

@@ -17,7 +17,7 @@ const prisma_1 = __importDefault(require("../../lib/prisma"));
 const cloudinary_1 = require("../../lib/cloudinary");
 const updateUserService = (id, body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { firstName, lastName, email, phoneNumber, address, profilePicture, gender, birthDate, role, } = body;
+        const { firstName, lastName, email, phoneNumber, address, profilePicture, gender, birthDate, } = body;
         if (email) {
             const existingUser = yield prisma_1.default.user.findFirst({
                 where: { email, id: { not: id } },
@@ -58,7 +58,6 @@ const updateUserService = (id, body) => __awaiter(void 0, void 0, void 0, functi
                 profilePicture: secureUrl,
                 gender,
                 birthDate: parsedDate,
-                role,
             },
         });
     }

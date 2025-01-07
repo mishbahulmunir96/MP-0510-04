@@ -25,8 +25,13 @@ export const getVouchersController = async (
 ) => {
   try {
     const userId = res.locals.user.id;
+    const { page = 1, take = 10 } = req.query;
 
-    const result = await getVouchersService(userId);
+    const result = await getVouchersService({
+      userId,
+      page: Number(page),
+      take: Number(take),
+    });
 
     res.status(200).send(result);
   } catch (error) {
