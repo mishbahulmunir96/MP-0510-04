@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { createEventService } from "../services/event/create-event.service";
 import { getEventService } from "../services/event/get-event.service";
-import { getEventsByUserService } from "../services/event/get-events-by-user.service";
+import { getEventsByOrganizerService } from "../services/event/get-events-by-organizer.service";
 import { getEventsService } from "../services/event/get-events.service";
 import { updateEventService } from "../services/event/update-event.service";
 
@@ -28,7 +28,7 @@ export const getEventsController = async (
   }
 };
 
-export const getEventsByUserController = async (
+export const getEventsByOrganizerController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,7 +36,7 @@ export const getEventsByUserController = async (
   try {
     const userId = res.locals.user.id;
 
-    const result = await getEventsByUserService(userId);
+    const result = await getEventsByOrganizerService(userId);
 
     res.status(200).send(result);
   } catch (error) {

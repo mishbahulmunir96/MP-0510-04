@@ -2,23 +2,28 @@ import { Router } from "express";
 import {
   createEventController,
   getEventController,
-  getEventsByUserController,
+  getEventsByOrganizerController,
   getEventsController,
   updateEventController,
 } from "../controllers/event.controller";
-import { uploader } from "../lib/multer";
+import { checkUserRole } from "../lib/checkUserRole";
 import { fileFilter } from "../lib/fileFilter";
+import { verifyToken } from "../lib/jwt";
+import { uploader } from "../lib/multer";
 import {
   validateCreateEvent,
   validateUpdateEvent,
 } from "../validators/event.validator";
-import { verifyToken } from "../lib/jwt";
-import { checkUserRole } from "../lib/checkUserRole";
 
 const router = Router();
 
 router.get("/", getEventsController);
-router.get("/byuser", verifyToken, checkUserRole, getEventsByUserController);
+router.get(
+  "/organizer",
+  verifyToken,
+  checkUserRole,
+  getEventsByOrganizerController
+);
 router.get("/:id", getEventController);
 router.post(
   "/create-event",

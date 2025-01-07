@@ -1,6 +1,6 @@
 import { Status } from "../../../prisma/generated/client";
 import { transporter } from "../../lib/nodemailer";
-import { notificationTrxEmail } from "../../lib/notificationTrxEmail";
+import { notificationTrxEmail } from "../../templates/notificationTrxEmail";
 import prisma from "../../lib/prisma";
 
 export const updateTransactionStatusService = async (
