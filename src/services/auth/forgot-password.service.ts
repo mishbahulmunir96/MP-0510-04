@@ -3,7 +3,7 @@ import { BASE_URL_FRONTEND, JWT_SECRET_FORGOT_PASSWORD } from "../../config";
 import { transporter } from "../../lib/nodemailer";
 import prisma from "../../lib/prisma";
 import { User } from "../../../prisma/generated/client";
-import { resetPasswordTemplate } from "../../lib/resetPasswordEmail";
+import { resetPasswordTemplate } from "../../templates/resetPasswordEmail";
 
 export const forgotPasswordService = async (body: Pick<User, "email">) => {
   try {

@@ -1,6 +1,6 @@
 import prisma from "../../lib/prisma";
 
-export const getEventsByUserService = async (userId: number) => {
+export const getEventsByOrganizerService = async (userId: number) => {
   try {
     return await prisma.event.findMany({
       where: { userId: userId },

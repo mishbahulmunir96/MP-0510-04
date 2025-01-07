@@ -10,7 +10,6 @@ interface UpdateUserBody {
   profilePicture?: Express.Multer.File;
   gender?: "Male" | "Female";
   birthDate?: string;
-  role?: "USER" | "ORGANIZER";
 }
 
 export const updateUserService = async (id: number, body: UpdateUserBody) => {
@@ -24,7 +23,6 @@ export const updateUserService = async (id: number, body: UpdateUserBody) => {
       profilePicture,
       gender,
       birthDate,
-      role,
     } = body;
 
     if (email) {
@@ -74,7 +72,6 @@ export const updateUserService = async (id: number, body: UpdateUserBody) => {
         profilePicture: secureUrl,
         gender,
         birthDate: parsedDate,
-        role,
       },
     });
   } catch (error) {
